@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>HTML5 Checkers</title>
+	<style type="text/css">
+		html, body {
+		  width:  95%;
+		  height: 95%;
+		  margin: 0px;
+		}
+
+		p {
+			color: black;
+			font-size: 25px;
+			font-weight: bold;
+		}
+		#canvasDiv {
+		   width: 100%;
+		   padding-top: 20px;
+		   text-align:center;
+		}
+
+		canvas {
+        	background-color: black;
+        	display: inline;
+      	}
+
+	</style>
+</head>
+<body>
+
+<div id="canvasDiv">
+<canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
+</div>
+
+
+<script src="jquery.js"></script>
+<script>
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+
+//create a 2d array to store all the places on the board
+var board = new Array(8);
+for(var k = 0; k<board.length; k++){
+	board[k] = new Array(8);
+}
+
+//track all the red checkers
+var redCheckers = [];
+//and all the black checkers
+var blackCheckers = [];
+
+function Checker(x,y,color){
+	this.x = x;
+	this.y = y;
+	this.color = color;
+	this.selected = false;
+
+	this.draw = function(){
+		ctx.beginPath();
+		ctx.fillStyle= this.color;
+		ctx.arc(this.x,this.y,40,0,2*Math.PI);
+		ctx.fill();
+		if(color == "black"){
+			ctx.lineWidth=1;
+			ctx.strokeStyle = "red";
+      		ctx.stroke();
+		}
+	}
+
+	this.select = function(){
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,40,0,2*Math.PI);
+		ctx.strokeStyle = "yellow";
+		ctx.lineWidth=1;
+      	ctx.stroke();
+      	this.selected = true;
+	}
+
+	this.isSelected = function(){
+		return selected;
+	}
+
+	this.unselect = function(){
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,40,0,2*Math.PI);
+		ctx.strokeStyle = "red";
+		ctx.lineWidth=2;
+	    ctx.stroke();
+		this.selected = false;
+	}
+
+	this.move = function(){
+
+	}
+
+	this.getX = function(){
+		return this.x;
+	}
+
+	this.getY = function(){
+		return this.y;
+	}
+}
+
+
+
+//- == Unplayable
+//E == Empty
+//X == red player
+//O == black player
+
+//draw the board and place the original checkers
+for(var i=0; i<8; i++){
+	for (var j=0; j<8; j++){
+		if((j % 2) == 0 && ((i % 2) == 0)){
+			ctx.fillStyle = "red";
+			ctx.fillRect((90*j), (90*i),90,90);
+			board[i][j] = "-";
+		}else if((j % 2) == 1 && ((i % 2) == 1)){
+			ctx.fillStyle = "red";
+			ctx.fillRect((90*j), (90*i),90,90);
+			board[i][j] = "-";
+		}else{
+			if(i<3){
+				//create and place the original checkers--12 checkers, black squares
+				//red checkers
+				board[i][j] = "X";
+				var checker = new Checker(90*j+45, 90*i+45, "red");
+				checker.draw();
+				redCheckers.push(checker)
+			}else if(i>4){
+				//black checkers
+				board[i][j] = "O";
+				var checker = new Checker(90*j+45, 90*i+45,"black");
+				checker.draw();
+      			blackCheckers.push(checker);
+			}else{
+				board[i][j] = "E";
+			}
+		}
+	}
+}
+
+//tracks whether a checker is currently selected or not
+var selected = false;
+
+//create listener for clicking on checkers
+$("#myCanvas").click(function(event){
+
+	var mouseX = event.clientX-360;
+	var mouseY = event.clientY;
+
+	if(selected == false){
+		for(var i =0; i<redCheckers.length; i++){
+			redChecker = redCheckers[i];
+			blackChecker = blackCheckers[i];
+
+			if((mouseX > redChecker.getX()-45 && mouseX < redChecker.getX() + 45) && (mouseY > redChecker.getY()-45 && mouseY < redChecker.getY() + 45)){
+				//highlight the circle
+
+				redChecker.select();
+				selected = true;
+			}else if((mouseX > blackChecker.getX()-45) && (mouseX < (blackChecker.getX() + 45)) && (mouseY > blackChecker.getY()-45) && (mouseY < blackChecker.getY() + 45)){
+				//highlight the circle
+				blackChecker.select();
+				selected = true;
+			}
+		}	
+	}else if(selected == true){
+		for(var i =0; i<redCheckers.length; i++){
+			redChecker = redCheckers[i];
+			blackChecker = blackCheckers[i];
+
+			if((mouseX > redChecker.getX()-45 && mouseX < redChecker.getX() + 45) && (mouseY > redChecker.getY()-45 && mouseY < redChecker.getY() + 45)){
+				//highlight the circle
+				if(redChecker.isSelected()){
+					redChecker.unselect();
+					selected = false;
+				}				
+			}else if((mouseX > blackChecker.getX()-45) && (mouseX < (blackChecker.getX() + 45)) && (mouseY > blackChecker.getY()-45) && (mouseY < blackChecker.getY() + 45)){
+				//highlight the circle
+				if(blackChecker.isSelected()){
+					blackChecker.unselect();
+					selected = false;
+				}
+			}
+		}	
+	}
+});
+
+
+
+
+
+
+
+
+//debugging to console
+function printGame(){
+	var output = "";
+	for(var i=0; i<8; i++){
+		for (var j=0; j<8; j++){
+			output+=board[i][j];
+		}
+		output+="\n";
+	}
+	console.log(output);
+}
+
+printGame();
+
+</script>
+
+
+
+</body>
+</html>
