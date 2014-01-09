@@ -5,19 +5,19 @@
 	<style type="text/css">
 		html, body {
 		  width:  95%;
-		  height: 95%;
+		  height: 100%;
 		  margin: 0px;
 		}
 
-		p {
-			color: black;
-			font-size: 25px;
-			font-weight: bold;
-		}
-		#canvasDiv {
+		table {
 		   width: 100%;
 		   padding-top: 20px;
 		   text-align:center;
+		}
+
+		td[rowspan] {
+			vertical-align: top;
+			text-align: left;
 		}
 
 		canvas {
@@ -25,35 +25,54 @@
         	display: inline;
       	}
 
+      	#turnText {
+      		text-align: center;
+      		font-size: 25px;
+      	}
+
 	</style>
 </head>
+
 <body>
 
-<div id="canvasDiv">
-<canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
-</div>
+
+<table>
+	<tr>
+		<td id="redText">
+			<font color="red"> Red Player: 12 remaining, 0 king(s)</font>
+		</td>
+		<td>
+			<div id="canvasDiv">
+			<canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
+			</div>
+		</td>
+		<td id="blackText">
+			Black Player: 12 remaining, 0 king(s)
+		</td>
+	</tr>
+	<tr >
+		<td>&nbsp;</td>
+		<td id="turnText">Black's Turn</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+
+
+
 
 
 <script src="jquery.js"></script>
 <script>
+
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 
-//create a 2d array to store all the places on the board
-var board = new Array(8);
-for(var k = 0; k<board.length; k++){
-	board[k] = new Array(8);
-}
-
-//track all the red checkers
-var redCheckers = [];
-//and all the black checkers
-var blackCheckers = [];
-
-function Checker(x,y,color){
+function Checker(x,y,color,currentSquare){
 	this.x = x;
 	this.y = y;
 	this.color = color;
+	this.king = false;
+	this.currentSquare = "";
 	this.selected = false;
 
 	this.draw = function(){
@@ -61,11 +80,42 @@ function Checker(x,y,color){
 		ctx.fillStyle= this.color;
 		ctx.arc(this.x,this.y,40,0,2*Math.PI);
 		ctx.fill();
-		if(color == "black"){
-			ctx.lineWidth=1;
+		if(this.king == true){
+			if(color == "black"){
+				ctx.lineWidth=4;
+				ctx.strokeStyle = "red";
+	      		ctx.stroke();
+			}
+		}else{
+			if(color == "black"){
+			ctx.lineWidth=2;
 			ctx.strokeStyle = "red";
       		ctx.stroke();
+			}
+		}		
+	}
+
+	this.jumped = function(){
+		if(this.color == "red"){
+			redRemaining--;
+		}else{
+			blackRemaining--;
 		}
+		ctx.beginPath();
+		ctx.fillStyle= "black";
+		ctx.arc(this.x,this.y,45,0,2*Math.PI);
+		ctx.fill();
+
+
+		//null out all references to the checker
+		this.x = null;
+		this.y = null;
+		this.color = null;
+		this.king = null;
+		this.currentSquare = null;
+		this.selected = null;
+
+
 	}
 
 	this.select = function(){
@@ -78,7 +128,11 @@ function Checker(x,y,color){
 	}
 
 	this.isSelected = function(){
-		return selected;
+		return this.selected;
+	}
+
+	this.setCurrentSquare = function(currentSquare){
+		this.currentSquare = currentSquare;
 	}
 
 	this.unselect = function(){
@@ -90,8 +144,193 @@ function Checker(x,y,color){
 		this.selected = false;
 	}
 
-	this.move = function(){
+	this.move = function(gameBoard, gameSquare){
+		var moveValid = false;
+		if(this.checkSpot(gameBoard, gameSquare)){
+			//if the move is valid
+			this.x = gameSquare.getX()+45;
+			this.y = gameSquare.getY()+45;
+			moveValid = true;
+		}
+		return moveValid;
+	}
 
+	//check whether or not the piece can move to the specified playable square
+	this.checkSpot = function(gameBoard, gameSquare){
+		var moveValid = false;
+
+		var currentSquareNum = this.currentSquare;
+		var newSquareNum = gameSquare.getSquareNumber();
+		var newSquare = playableSquares[newSquareNum];
+		
+		//[int(spot / 4) == 1,3,5,7]
+		//or [int(spot / 4) == 0,2,4,6]
+		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 || Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
+			moveValid = this.checkMove(3,4, currentSquareNum, newSquareNum, newSquare);
+		}else{
+			moveValid = this.checkMove(4,5, currentSquareNum, newSquareNum, newSquare);
+		}
+
+		return moveValid;
+	}
+
+	this.checkMove = function(a,b, currentSquareNum, newSquareNum, newSquare){
+
+		var moveValid = false;
+
+		if(this.color == "red" && this.king ==false){
+
+				//console.log(currentSquareNum);
+				//console.log(newSquareNum);
+				//console.log(newSquare);
+
+			//red, not kinged can move to [spot +4,5] if adjacent and empty
+			if((newSquareNum == (currentSquareNum + a) || newSquareNum == (currentSquareNum + b)) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+				if(newSquareNum > 27 && newSquareNum < 32){
+					//[28-31] equals kings for red
+					this.king = true;
+					redKings++;
+				}	
+			}
+			//red, not kinged can move to [spot +7,9] if black on [spot +4,5]
+			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) || (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty())) && newSquare.isEmpty()){
+					moveValid = true;
+					this.currentSquare = newSquareNum;
+
+					var checkerJumped = "";
+					//remove jumped checker from square
+					if(newSquareNum == currentSquareNum+7){
+						checkerJumped = getCheckerBySquareNum(currentSquareNum+3);
+						checkerJumped.jumped();
+						playableSquares[currentSquareNum+3].checker = "";
+					}else{
+						checkerJumped = getCheckerBySquareNum(currentSquareNum+4);;
+						checkerJumped.jumped();
+						playableSquares[currentSquareNum+4].checker = "";
+					}
+					
+					if(newSquareNum > 27 && newSquareNum < 32){
+						//[28-31] equals kings for red
+						this.king = true;
+						redKings++;
+					}
+					
+			}
+
+		}else if(this.color == "black" && this.king == false){
+			//black, not kinged can move to  [spot -4,5] if adjacent and empty
+			//black, not kinged can move to [spot -7,9] if red on [spot -4,5]
+			
+			//swap the inputs for going the opposite direction
+			if(a == 4 && b == 5){
+				a = 3;
+				b = 4;
+			}else{
+				a = 4;
+				b = 5;
+			}
+
+			if((newSquareNum == (currentSquareNum - a) || newSquareNum == (currentSquareNum - b)) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+				if(newSquareNum > 0 && newSquareNum < 4){
+					//[28-31] equals kings for red
+					this.king = true;
+					blackKings++;
+				}	
+			}
+			//red, not kinged can move to [spot +7,9] if black on [spot +4,5]
+			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) || (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty())) && newSquare.isEmpty()){
+					moveValid = true;
+					this.currentSquare = newSquareNum;
+
+					var checkerJumped = "";
+					//remove jumped checker from square
+					if(newSquareNum == currentSquareNum-7){
+						checkerJumped = getCheckerBySquareNum(currentSquareNum-3);
+						checkerJumped.jumped();
+						playableSquares[currentSquareNum-3].checker = "";
+					}else{
+						checkerJumped = getCheckerBySquareNum(currentSquareNum-4);
+						checkerJumped.jumped();
+						playableSquares[currentSquareNum-4].checker = "";
+					}
+
+
+					if(newSquareNum > 0 && newSquareNum < 4){
+						//[28-31] equals kings for red
+						this.king = true;
+						blackKings++;
+					}	
+			}
+		}
+
+		else if( this.king == true){
+			//kinged can move to [spot +4,5] if empty and can move back to [spot -4,5] if empty
+			//kinged can move to [spot +7,9] if other on [spot +4,5] and can move back to [spot -7,9] if other on [spot -4,5]
+
+			//kinged can move to [spot +4,5] if adjacent and empty
+			if((newSquareNum == (currentSquareNum + a) || newSquareNum == (currentSquareNum + b)) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+				
+			}
+			else if((newSquareNum == (currentSquareNum - a) || newSquareNum == (currentSquareNum - b)) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+			}
+			//kinged can move to [spot +7,9] if black on [spot +4,5]
+			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+4].isEmpty()) || (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+5].isEmpty())) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+					
+			}
+			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-4].isEmpty()) || (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-5].isEmpty())) && newSquare.isEmpty()){
+				moveValid = true;
+				this.currentSquare = newSquareNum;
+			}
+
+		}
+
+		//-----RULES OF MOVEMENT-----=
+		// 	0  1  2  3 
+		// 4  5  6  7
+		// 	8  9  10 11
+		// 12 13 14 15 
+		// 	16 17 18 19
+		// 20 21 22 23
+		// 	24 25 26 27
+		// 28 29 30 31
+
+		//can only move one spot
+		//3,4,11,12,19,20,27,28
+
+		return moveValid;
+	}
+
+
+	this.findSquare = function(){
+		var square = "";
+		for(var i=0; i < playableSquares.length; i++){
+			square = playableSquares[i];
+			if (!( this.x > square.getX() && this.x < square.getX() + square.getW() 
+				&& this.y > square.getY() && this.y < square.getY() + square.getH() )){
+				square = "";
+			}else{
+				break;
+			}
+		}
+		return square;
+	}
+
+	this.setKing = function(){
+		this.king = true;
+	}
+
+	this.isKing = function(){
+		return this.king;
 	}
 
 	this.getX = function(){
@@ -103,7 +342,95 @@ function Checker(x,y,color){
 	}
 }
 
+function PlayableSquare(x,y,w,h, number){
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+	this.checker = "";
+	this.squareNumber = number;
 
+	this.isEmpty = function(){
+		return (this.checker == "");
+	}
+
+	this.placeChecker = function(checker){
+		this.checker = checker;
+	}
+
+	this.removeChecker = function(){
+		this.checker = ""
+		ctx.fillStyle = "black";
+		ctx.fillRect(this.x, this.y, this.w, this.h);
+	}
+
+	this.isClicked = function(x,y){
+		var clicked = false;
+		if(x>this.x && x < this.x+w && y > this.y && y < this.y + this.h){
+			clicked = true;
+		}
+		return clicked;
+	}
+
+	this.getX = function(){
+		return this.x;
+	}
+
+	this.getY = function(){
+		return this.y;
+	}
+
+	this.getW = function(){
+		return this.w;
+	}
+
+	this.getH = function(){
+		return this.h;
+	}
+
+	this.getSquareNumber = function(){
+		return this.squareNumber;
+	}
+}
+
+function getCheckerBySquareNum(num){
+	var checker = "";
+	for(var i = 0; i<blackCheckers.length; i++){
+		if(blackCheckers[i].currentSquare == num){
+			checker = blackCheckers[i];
+		}else if(redCheckers[i].currentSquare == num){
+			checker = redCheckers[i];
+		}
+	}
+	return checker;
+}
+
+function checkGameStatus(){
+	if(redRemaining == 0){
+		//display black wins
+		alert("Black player wins!");
+	}
+	else if(blackRemaining == 0){
+		//display red wins
+		alert("Red player wins!");
+
+	}else{
+		jAlert('This is a custom alert box', 'Alert Dialog');
+	}
+}
+
+//create a 2d array to store all the places on the board
+var board = new Array(8);
+for(var k = 0; k<board.length; k++){
+	board[k] = new Array(8);
+}
+
+//track all the red checkers
+var redCheckers = [];
+//and all the black checkers
+var blackCheckers = [];
+//all the playable squares
+var playableSquares = [];
 
 //- == Unplayable
 //E == Empty
@@ -111,6 +438,7 @@ function Checker(x,y,color){
 //O == black player
 
 //draw the board and place the original checkers
+var squareNumber = 0;
 for(var i=0; i<8; i++){
 	for (var j=0; j<8; j++){
 		if((j % 2) == 0 && ((i % 2) == 0)){
@@ -126,48 +454,111 @@ for(var i=0; i<8; i++){
 				//create and place the original checkers--12 checkers, black squares
 				//red checkers
 				board[i][j] = "X";
+
 				var checker = new Checker(90*j+45, 90*i+45, "red");
 				checker.draw();
+
+				var square = new PlayableSquare(90*j, 90*i,90,90,squareNumber);
+				checker.setCurrentSquare(squareNumber);
+				squareNumber++;
+				square.placeChecker(checker);
+
+				//push to the arrays
 				redCheckers.push(checker)
+				playableSquares.push(square);
+
 			}else if(i>4){
 				//black checkers
 				board[i][j] = "O";
 				var checker = new Checker(90*j+45, 90*i+45,"black");
 				checker.draw();
-      			blackCheckers.push(checker);
+      			
+
+      			var square = new PlayableSquare(90*j, 90*i,90,90,squareNumber);
+      			checker.setCurrentSquare(squareNumber);
+      			squareNumber++;
+				square.placeChecker(checker);
+
+				blackCheckers.push(checker);
+				playableSquares.push(square);
+
 			}else{
 				board[i][j] = "E";
+				//add the black square to the array squares that are playable
+				playableSquares.push(new PlayableSquare(90*j, 90*i,90,90,squareNumber));
+				squareNumber++;
 			}
+			
 		}
 	}
 }
 
+
+
 //tracks whether a checker is currently selected or not
 var selected = false;
+var checkerSelected = "";
+var previousSquare = "";
+var turn = "black";
 
-//create listener for clicking on checkers
+
+
+//create listener for playing the game
 $("#myCanvas").click(function(event){
 
 	var mouseX = event.clientX-360;
 	var mouseY = event.clientY;
 
+	//check if a checker is being selected
 	if(selected == false){
 		for(var i =0; i<redCheckers.length; i++){
 			redChecker = redCheckers[i];
 			blackChecker = blackCheckers[i];
 
-			if((mouseX > redChecker.getX()-45 && mouseX < redChecker.getX() + 45) && (mouseY > redChecker.getY()-45 && mouseY < redChecker.getY() + 45)){
+			if(turn == "red" && (mouseX > redChecker.getX()-45 && mouseX < redChecker.getX() + 45) && (mouseY > redChecker.getY()-45 && mouseY < redChecker.getY() + 45)){
 				//highlight the circle
-
 				redChecker.select();
 				selected = true;
-			}else if((mouseX > blackChecker.getX()-45) && (mouseX < (blackChecker.getX() + 45)) && (mouseY > blackChecker.getY()-45) && (mouseY < blackChecker.getY() + 45)){
+				checkerSelected = redChecker;
+				previousSquare = checkerSelected.findSquare();
+
+			}else if(turn == "black" && (mouseX > blackChecker.getX()-45) && (mouseX < (blackChecker.getX() + 45)) && (mouseY > blackChecker.getY()-45) && (mouseY < blackChecker.getY() + 45)){
 				//highlight the circle
 				blackChecker.select();
 				selected = true;
+				checkerSelected = blackChecker;
+				previousSquare = checkerSelected.findSquare();
 			}
-		}	
+		}
+	//unselect or move an already selected checker	
 	}else if(selected == true){
+		//console.log(previousSquare.getX() + " " + previousSquare.getY());
+		
+		//if the checker is to be moved
+		for(var h = 0; h < playableSquares.length; h++){
+			var gameSquare = playableSquares[h];
+			if(gameSquare.isClicked(mouseX, mouseY) && gameSquare.isEmpty()){
+				//move the checker if the move is valid
+				if(checkerSelected.move(playableSquares, gameSquare)){
+					//need to remove checker from previous position
+					if(previousSquare != ""){
+						previousSquare.removeChecker();
+					}
+					checkerSelected.draw();
+					gameSquare.placeChecker(checkerSelected);
+					previousSquare = "";
+					if(turn == "black"){
+						turn = "red";
+						changeTurnText("Red");
+					}else{
+						turn = "black";
+						changeTurnText("Black");
+					}
+				}
+			}
+		}
+
+		//if the checker is clicked again to be unselected
 		for(var i =0; i<redCheckers.length; i++){
 			redChecker = redCheckers[i];
 			blackChecker = blackCheckers[i];
@@ -187,28 +578,33 @@ $("#myCanvas").click(function(event){
 			}
 		}	
 	}
+	checkGameStatus();
 });
 
+//tracking remaining pieces and kings for each color
+var blackKings = 0;
+var redKings = 0;
+var blackRemaining = 12;
+var redRemaining = 12;
 
 
 
-
-
-
-
-//debugging to console
-function printGame(){
-	var output = "";
-	for(var i=0; i<8; i++){
-		for (var j=0; j<8; j++){
-			output+=board[i][j];
-		}
-		output+="\n";
+//function to change text denoting who's turn it is
+function changeTurnText(s){
+	if(s == "Red"){
+		$("#turnText").css('color', 'red');
+	}else{
+		$("#turnText").css('color', 'black');
 	}
-	console.log(output);
+	$("#turnText").html(s + "\'s turn");
+
+	//update number of pieces and kings remaining for each player
+	$("#redText").css('color', 'red');
+	$("#redText").html("Red Player: " + redRemaining + " remaining, " + redKings + " king(s)");
+	$("#blackText").html("Black Player: " + blackRemaining + " remaining, " + blackKings + " king(s)");
 }
 
-printGame();
+
 
 </script>
 
