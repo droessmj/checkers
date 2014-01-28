@@ -45,8 +45,6 @@ function Checker(x,y,color,currentSquare){
 		this.king = null;
 		this.currentSquare = null;
 		this.selected = null;
-
-
 	}
 
 	this.select = function(){
@@ -106,15 +104,9 @@ function Checker(x,y,color,currentSquare){
 	}
 
 	this.checkMove = function(a,b, currentSquareNum, newSquareNum, newSquare){
-
 		var moveValid = false;
 
 		if(this.color == "red" && this.king ==false){
-
-				//console.log(currentSquareNum);
-				//console.log(newSquareNum);
-				//console.log(newSquare);
-
 			//red, not kinged can move to [spot +4,5] if adjacent and empty
 			if((newSquareNum == (currentSquareNum + a) || newSquareNum == (currentSquareNum + b)) && newSquare.isEmpty()){
 				moveValid = true;
@@ -133,13 +125,24 @@ function Checker(x,y,color,currentSquare){
 					var checkerJumped = "";
 					//remove jumped checker from square
 					if(newSquareNum == currentSquareNum+7){
-						checkerJumped = getCheckerBySquareNum(currentSquareNum+3);
-						checkerJumped.jumped();
-						playableSquares[currentSquareNum+3].checker = "";
+						checkerJumped = getCheckerBySquareNum(currentSquareNum+a);
+						if (checkerJumped != ""){
+							checkerJumped.jumped();
+							console.log("jumped1");
+						}else{
+							console.log("error1");
+						}
+						
+						playableSquares[currentSquareNum+a].checker = "";
 					}else{
-						checkerJumped = getCheckerBySquareNum(currentSquareNum+4);;
-						checkerJumped.jumped();
-						playableSquares[currentSquareNum+4].checker = "";
+						checkerJumped = getCheckerBySquareNum(currentSquareNum+b);;
+						if (checkerJumped != ""){
+							checkerJumped.jumped();
+							console.log("jumped2");
+						}else{
+							console.log("error2");
+						}
+						playableSquares[currentSquareNum+b].checker = "";
 					}
 					
 					if(newSquareNum > 27 && newSquareNum < 32){
@@ -147,7 +150,6 @@ function Checker(x,y,color,currentSquare){
 						this.king = true;
 						redKings++;
 					}
-					
 			}
 
 		}else if(this.color == "black" && this.king == false){
@@ -162,17 +164,16 @@ function Checker(x,y,color,currentSquare){
 				a = 4;
 				b = 5;
 			}
-
 			if((newSquareNum == (currentSquareNum - a) || newSquareNum == (currentSquareNum - b)) && newSquare.isEmpty()){
 				moveValid = true;
 				this.currentSquare = newSquareNum;
 				if(newSquareNum > 0 && newSquareNum < 4){
-					//[28-31] equals kings for red
+					//[28-31] equals kings for black
 					this.king = true;
 					blackKings++;
 				}	
 			}
-			//red, not kinged can move to [spot +7,9] if black on [spot +4,5]
+			//black, not kinged can move to [spot +7,9] if black on [spot +4,5]
 			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) || (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty())) && newSquare.isEmpty()){
 					moveValid = true;
 					this.currentSquare = newSquareNum;
@@ -180,18 +181,28 @@ function Checker(x,y,color,currentSquare){
 					var checkerJumped = "";
 					//remove jumped checker from square
 					if(newSquareNum == currentSquareNum-7){
-						checkerJumped = getCheckerBySquareNum(currentSquareNum-3);
-						checkerJumped.jumped();
-						playableSquares[currentSquareNum-3].checker = "";
+						checkerJumped = getCheckerBySquareNum(currentSquareNum-a);
+						if (checkerJumped != ""){
+							checkerJumped.jumped();
+							console.log("jumped3");
+						}else{
+							console.log("error3");
+						}
+						playableSquares[currentSquareNum-a].checker = "";
 					}else{
-						checkerJumped = getCheckerBySquareNum(currentSquareNum-4);
-						checkerJumped.jumped();
-						playableSquares[currentSquareNum-4].checker = "";
+						checkerJumped = getCheckerBySquareNum(currentSquareNum-b);
+						if (checkerJumped != ""){
+							checkerJumped.jumped();
+							console.log("jumped4");
+						}else{
+							console.log("error4");
+						}
+						playableSquares[currentSquareNum-b].checker = "";
 					}
 
 
-					if(newSquareNum > 0 && newSquareNum < 4){
-						//[28-31] equals kings for red
+					if(newSquareNum >= 0 && newSquareNum < 4){
+						//[28-31] equals kings for black
 						this.king = true;
 						blackKings++;
 					}	
@@ -205,8 +216,7 @@ function Checker(x,y,color,currentSquare){
 			//kinged can move to [spot +4,5] if adjacent and empty
 			if((newSquareNum == (currentSquareNum + a) || newSquareNum == (currentSquareNum + b)) && newSquare.isEmpty()){
 				moveValid = true;
-				this.currentSquare = newSquareNum;
-				
+				this.currentSquare = newSquareNum;	
 			}
 			else if((newSquareNum == (currentSquareNum - a) || newSquareNum == (currentSquareNum - b)) && newSquare.isEmpty()){
 				moveValid = true;
@@ -215,14 +225,12 @@ function Checker(x,y,color,currentSquare){
 			//kinged can move to [spot +7,9] if black on [spot +4,5]
 			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+4].isEmpty()) || (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+5].isEmpty())) && newSquare.isEmpty()){
 				moveValid = true;
-				this.currentSquare = newSquareNum;
-					
+				this.currentSquare = newSquareNum;	
 			}
 			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-4].isEmpty()) || (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-5].isEmpty())) && newSquare.isEmpty()){
 				moveValid = true;
 				this.currentSquare = newSquareNum;
 			}
-
 		}
 
 		//-----RULES OF MOVEMENT-----=
@@ -237,7 +245,6 @@ function Checker(x,y,color,currentSquare){
 
 		//can only move one spot
 		//3,4,11,12,19,20,27,28
-
 		return moveValid;
 	}
 
