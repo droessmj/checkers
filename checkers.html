@@ -262,12 +262,20 @@ $("#myCanvas").click(function(event){
 					checkerSelected.draw();
 					gameSquare.placeChecker(checkerSelected);
 					previousSquare = "";
-					if(turn == "black"){
-						turn = "red";
-						changeTurnText("Red");
+
+					//check for double jump
+					if(checkerSelected.checkDouble()){
+						//do nothing?
 					}else{
-						turn = "black";
-						changeTurnText("Black");
+						//no double jump opportunity
+						if(turn == "black"){
+							turn = "red";
+							changeTurnText("Red");
+						}else{
+							turn = "black";
+							changeTurnText("Black");
+						}
+
 					}
 				}
 			}

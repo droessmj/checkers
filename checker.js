@@ -26,6 +26,85 @@ function Checker(x,y,color,currentSquare){
 		}		
 	}
 
+	this.checkDouble = function(){
+		//check if there is opportunity for a double jump
+		var doubleJump = false;
+		var currentSquareNum= this.currentSquare;
+		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 || Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
+			a = 3;
+			b = 4;
+		}else{
+			a = 4;
+			b = 5;
+		}
+
+		if (this.color == "red" && this.king == false){
+			var newSquareNum = currentSquareNum+7;
+			var newSquare = playableSquares[newSquareNum];
+
+			if((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
+				doubleJump = true;
+			}
+
+			newSquareNum = currentSquareNum+9;
+			newSquare = playableSquares[newSquareNum];
+
+			if((newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
+				doubleJump = true;
+			}
+
+		}else if(this.color == "black" && this.king == false){
+			
+			if(a == 4 && b == 5){
+				a = 3;
+				b = 4;
+			}else{
+				a = 4;
+				b = 5;
+			}
+
+			var newSquareNum = currentSquareNum-7;
+			var newSquare = playableSquares[newSquareNum];
+			//a,b, currentSquareNum, newSquareNum, newSquare
+
+			if(false){
+				doubleJump = true;
+			}
+			newSquareNum = currentSquareNum-9;
+			newSquare = playableSquares[newSquareNum];
+			if(false){
+				doubleJump = true;
+			}
+
+
+		}else if(this.king == true){
+			var newSquareNum = currentSquareNum-7;
+			var newSquare = playableSquares[newSquareNum];
+			//a,b, currentSquareNum, newSquareNum, newSquare
+			if(false){
+				doubleJump = true;
+			}
+			newSquareNum = currentSquareNum-9;
+			newSquare = playableSquares[newSquareNum];
+			if(false){
+				doubleJump = true;
+			}
+			newSquareNum = currentSquareNum+7;
+			newSquare = playableSquares[newSquareNum];
+			if(false){
+				doubleJump = true;
+			}
+			newSquareNum = currentSquareNum+9;
+			newSquare = playableSquares[newSquareNum];
+			if(false){
+				doubleJump = true;
+			}
+
+		}
+
+		return doubleJump;
+	}
+
 	this.jumped = function(){
 		if(this.color == "red"){
 			redRemaining--;
@@ -126,22 +205,11 @@ function Checker(x,y,color,currentSquare){
 					//remove jumped checker from square
 					if(newSquareNum == currentSquareNum+7){
 						checkerJumped = getCheckerBySquareNum(currentSquareNum+a);
-						if (checkerJumped != ""){
-							checkerJumped.jumped();
-							console.log("jumped1");
-						}else{
-							console.log("error1");
-						}
-						
+						checkerJumped.jumped();
 						playableSquares[currentSquareNum+a].checker = "";
 					}else{
-						checkerJumped = getCheckerBySquareNum(currentSquareNum+b);;
-						if (checkerJumped != ""){
-							checkerJumped.jumped();
-							console.log("jumped2");
-						}else{
-							console.log("error2");
-						}
+						checkerJumped = getCheckerBySquareNum(currentSquareNum+b);
+						checkerJumped.jumped();
 						playableSquares[currentSquareNum+b].checker = "";
 					}
 					
@@ -182,21 +250,11 @@ function Checker(x,y,color,currentSquare){
 					//remove jumped checker from square
 					if(newSquareNum == currentSquareNum-7){
 						checkerJumped = getCheckerBySquareNum(currentSquareNum-a);
-						if (checkerJumped != ""){
-							checkerJumped.jumped();
-							console.log("jumped3");
-						}else{
-							console.log("error3");
-						}
+						checkerJumped.jumped();
 						playableSquares[currentSquareNum-a].checker = "";
 					}else{
 						checkerJumped = getCheckerBySquareNum(currentSquareNum-b);
-						if (checkerJumped != ""){
-							checkerJumped.jumped();
-							console.log("jumped4");
-						}else{
-							console.log("error4");
-						}
+						checkerJumped.jumped();
 						playableSquares[currentSquareNum-b].checker = "";
 					}
 
