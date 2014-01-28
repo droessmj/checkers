@@ -247,7 +247,6 @@ $("#myCanvas").click(function(event){
 		}
 	//unselect or move an already selected checker	
 	}else if(selected == true){
-		//console.log(previousSquare.getX() + " " + previousSquare.getY());
 		
 		//if the checker is to be moved
 		for(var h = 0; h < playableSquares.length; h++){
@@ -264,8 +263,9 @@ $("#myCanvas").click(function(event){
 					previousSquare = "";
 
 					//check for double jump
-					if(checkerSelected.checkDouble()){
-						//do nothing?
+					if(checkerSelected.getJustJumped() && checkerSelected.checkDouble()){
+						//force current checker to stay selected
+
 					}else{
 						//no double jump opportunity
 						if(turn == "black"){
@@ -275,8 +275,8 @@ $("#myCanvas").click(function(event){
 							turn = "black";
 							changeTurnText("Black");
 						}
-
 					}
+					checkerSelected.setJustJumped(false);
 				}
 			}
 		}
@@ -307,7 +307,7 @@ $("#myCanvas").click(function(event){
 
 </script>
 
-<p> TODO: Implement double jump. Perfect king movement and jumping </p>
+<p> TODO: Force selected checker to stay selected after doublejump. Perfect king movement and jumping. Add AI </p>
 
 </body>
 </html>

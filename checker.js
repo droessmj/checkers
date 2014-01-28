@@ -5,6 +5,7 @@ function Checker(x,y,color,currentSquare){
 	this.king = false;
 	this.currentSquare = "";
 	this.selected = false;
+	this.justJumped = false;
 
 	this.draw = function(){
 		ctx.beginPath();
@@ -26,6 +27,14 @@ function Checker(x,y,color,currentSquare){
 		}		
 	}
 
+	this.getJustJumped = function(){
+		return this.justJumped;
+	}
+
+	this.setJustJumped = function(parameter){
+		this.justJumped = parameter;
+	}
+
 	this.checkDouble = function(){
 		//check if there is opportunity for a double jump
 		var doubleJump = false;
@@ -39,17 +48,34 @@ function Checker(x,y,color,currentSquare){
 		}
 
 		if (this.color == "red" && this.king == false){
-			var newSquareNum = currentSquareNum+7;
-			var newSquare = playableSquares[newSquareNum];
+			var newSquareNum = 0;
+			var newSquare = "";
 
-			if((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
+			if((currentSquareNum+7 < 32)){
+				newSquareNum = currentSquareNum+7;
+				newSquare = playableSquares[newSquareNum];	
+			}else{
+				return false;
+			}
+
+			if((newSquareNum == (currentSquareNum + 7) 
+				&& !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
 			}
 
-			newSquareNum = currentSquareNum+9;
-			newSquare = playableSquares[newSquareNum];
 
-			if((newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
+
+
+			if((currentSquareNum+9 < 32)){
+				newSquareNum = currentSquareNum+9;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}
+
+
+			if((newSquareNum == (currentSquareNum + 9) 
+				&& !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
 			}
 
@@ -63,43 +89,98 @@ function Checker(x,y,color,currentSquare){
 				b = 5;
 			}
 
-			var newSquareNum = currentSquareNum-7;
-			var newSquare = playableSquares[newSquareNum];
-			//a,b, currentSquareNum, newSquareNum, newSquare
+			var newSquareNum = 0;
+			var newSquare = "";
 
-			if(false){
+			if((currentSquareNum-7 > -1)){
+				newSquareNum = currentSquareNum-7;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}
+
+			if((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
 			}
-			newSquareNum = currentSquareNum-9;
-			newSquare = playableSquares[newSquareNum];
-			if(false){
+
+
+
+
+			if(currentSquareNum-9 > -1){
+				newSquareNum = currentSquareNum-9;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}	
+
+			if((newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
 			}
 
 
 		}else if(this.king == true){
-			var newSquareNum = currentSquareNum-7;
-			var newSquare = playableSquares[newSquareNum];
-			//a,b, currentSquareNum, newSquareNum, newSquare
-			if(false){
-				doubleJump = true;
+			
+			var newSquareNum = 0;
+			var newSquare = "";
+
+			if((currentSquareNum-7 > -1)){
+				newSquareNum = currentSquareNum-7;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
 			}
-			newSquareNum = currentSquareNum-9;
-			newSquare = playableSquares[newSquareNum];
-			if(false){
-				doubleJump = true;
-			}
-			newSquareNum = currentSquareNum+7;
-			newSquare = playableSquares[newSquareNum];
-			if(false){
-				doubleJump = true;
-			}
-			newSquareNum = currentSquareNum+9;
-			newSquare = playableSquares[newSquareNum];
-			if(false){
+
+			if((newSquareNum == (currentSquareNum - 7) 
+				&& !playableSquares[currentSquareNum-a].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
 			}
 
+
+
+			if((currentSquareNum-9 > -1)){
+				newSquareNum = currentSquareNum-9;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}
+
+			if((newSquareNum == (currentSquareNum - 9) 
+				&& !playableSquares[currentSquareNum-b].isEmpty()) && newSquare.isEmpty()){
+				doubleJump = true;
+			}
+
+
+
+
+
+			if((currentSquareNum+7 < 32)){
+				newSquareNum = currentSquareNum+7;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}
+
+
+			if((newSquareNum == (currentSquareNum + 7) 
+				&& !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
+				doubleJump = true;
+			}
+
+
+
+
+
+			if((currentSquareNum+9 < 32)){
+				newSquareNum = currentSquareNum+9;
+				newSquare = playableSquares[newSquareNum];
+			}else{
+				return false;
+			}
+
+			if((newSquareNum == (currentSquareNum + 9) 
+				&& !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
+				doubleJump = true;
+			}
 		}
 
 		return doubleJump;
@@ -206,10 +287,12 @@ function Checker(x,y,color,currentSquare){
 					if(newSquareNum == currentSquareNum+7){
 						checkerJumped = getCheckerBySquareNum(currentSquareNum+a);
 						checkerJumped.jumped();
+						this.setJustJumped(true);
 						playableSquares[currentSquareNum+a].checker = "";
 					}else{
 						checkerJumped = getCheckerBySquareNum(currentSquareNum+b);
 						checkerJumped.jumped();
+						this.setJustJumped(true);
 						playableSquares[currentSquareNum+b].checker = "";
 					}
 					
@@ -251,10 +334,12 @@ function Checker(x,y,color,currentSquare){
 					if(newSquareNum == currentSquareNum-7){
 						checkerJumped = getCheckerBySquareNum(currentSquareNum-a);
 						checkerJumped.jumped();
+						this.setJustJumped(true);
 						playableSquares[currentSquareNum-a].checker = "";
 					}else{
 						checkerJumped = getCheckerBySquareNum(currentSquareNum-b);
 						checkerJumped.jumped();
+						this.setJustJumped(true);
 						playableSquares[currentSquareNum-b].checker = "";
 					}
 
