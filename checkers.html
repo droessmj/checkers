@@ -271,6 +271,7 @@ $("#myCanvas").click(function(event){
 					}else{
 						//remove force
 						checkerSelected.setForce(false);
+						checkerSelected.setJustJumped(false);
 						//no double jump opportunity
 						if(turn == "black"){
 							turn = "red";
@@ -280,7 +281,7 @@ $("#myCanvas").click(function(event){
 							changeTurnText("Black");
 						}
 					}
-					checkerSelected.setJustJumped(false);
+					
 				}
 			}
 		}

@@ -63,31 +63,18 @@ function Checker(x,y,color,currentSquare){
 			if((currentSquareNum+7 < 32)){
 				newSquareNum = currentSquareNum+7;
 				newSquare = playableSquares[newSquareNum];
-				console.log(currentSquareNum + " " + a);	
-			}else{
-				return false;
+				if((!playableSquares[currentSquareNum+a].isEmpty()) && playableSquares[currentSquareNum+a].checker.color == "black" && newSquare.isEmpty()){
+					doubleJump = true;
+				}
 			}
-			
-			if((newSquareNum == (currentSquareNum + 7) 
-				&& !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
-
-
 
 
 			if((currentSquareNum+9 < 32)){
 				newSquareNum = currentSquareNum+9;
 				newSquare = playableSquares[newSquareNum];
-				console.log(currentSquareNum + " " + b);
-			}else{
-				return false;
-			}
-
-
-			if((newSquareNum == (currentSquareNum + 9) 
-				&& !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
+				if((!playableSquares[currentSquareNum+b].isEmpty()) && playableSquares[currentSquareNum+b].checker.color == "black" && newSquare.isEmpty()){
+					doubleJump = true;
+				}
 			}
 
 		}else if(this.color == "black" && this.king == false){
@@ -106,94 +93,98 @@ function Checker(x,y,color,currentSquare){
 			if((currentSquareNum-7 > -1)){
 				newSquareNum = currentSquareNum-7;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
+				if((!playableSquares[currentSquareNum-a].isEmpty()) && playableSquares[currentSquareNum-a].checker.color == "red" && newSquare.isEmpty()){
+					doubleJump = true;
+				}
 			}
-
-			if((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
-
 
 
 
 			if(currentSquareNum-9 > -1){
 				newSquareNum = currentSquareNum-9;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
+				if((!playableSquares[currentSquareNum-b].isEmpty()) && playableSquares[currentSquareNum-b].checker.color == "red" && newSquare.isEmpty()){
+					doubleJump = true;
+				}
 			}	
-
-			if((newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
 
 
 		}else if(this.king == true){
-			
+
 			var newSquareNum = 0;
 			var newSquare = "";
+			var opposite = "";
+
+			if (this.color == "red"){
+				opposite = "black";
+			}else{
+				opposite = "red";
+			}
 
 			if((currentSquareNum-7 > -1)){
 				newSquareNum = currentSquareNum-7;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
+				if(currentSquareNum > newSquareNum){
+					a = 4;
+					b = 5;
+				}else{
+					a = 3;
+					b = 4;
+				}
+				if((!playableSquares[currentSquareNum-a].isEmpty()) && playableSquares[currentSquareNum-a].checker.color == opposite && newSquare.isEmpty()){
+					doubleJump = true;
+					console.log(a + " " + currentSquareNum + " " + newSquareNum);
+				}
 			}
-
-			if((newSquareNum == (currentSquareNum - 7) 
-				&& !playableSquares[currentSquareNum-a].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
-
-
 
 			if((currentSquareNum-9 > -1)){
 				newSquareNum = currentSquareNum-9;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
+				if(currentSquareNum > newSquareNum){
+					a = 4;
+					b = 5;
+				}else{
+					a = 3;
+					b = 4;
+				}
+				if((!playableSquares[currentSquareNum-b].isEmpty()) && playableSquares[currentSquareNum-b].checker.color == opposite && newSquare.isEmpty()){
+					doubleJump = true;
+					console.log(b + " " + currentSquareNum + " " + newSquareNum);
+				}
 			}
-
-			if((newSquareNum == (currentSquareNum - 9) 
-				&& !playableSquares[currentSquareNum-b].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
-
-
-
-
 
 			if((currentSquareNum+7 < 32)){
 				newSquareNum = currentSquareNum+7;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
+				if(currentSquareNum > newSquareNum){
+					a = 4;
+					b = 5;
+				}else{
+					a = 3;
+					b = 4;
+				}
+				if((!playableSquares[currentSquareNum+a].isEmpty()) && playableSquares[currentSquareNum+a].checker.color == opposite && newSquare.isEmpty()){
+					doubleJump = true;
+					console.log(a + " " + currentSquareNum + " " + newSquareNum);
+				}
 			}
-
-
-			if((newSquareNum == (currentSquareNum + 7) 
-				&& !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
-			}
-
-
-
-
 
 			if((currentSquareNum+9 < 32)){
 				newSquareNum = currentSquareNum+9;
 				newSquare = playableSquares[newSquareNum];
-			}else{
-				return false;
-			}
-
-			if((newSquareNum == (currentSquareNum + 9) 
-				&& !playableSquares[currentSquareNum+b].isEmpty()) && newSquare.isEmpty()){
-				doubleJump = true;
+				if(currentSquareNum > newSquareNum){
+					a = 4;
+					b = 5;
+				}else{
+					a = 3;
+					b = 4;
+				}
+				if((!playableSquares[currentSquareNum+b].isEmpty()) && playableSquares[currentSquareNum+b].checker.color == opposite && newSquare.isEmpty()){
+					doubleJump = true;
+					console.log(b + " " + currentSquareNum + " " + newSquareNum);
+				}
 			}
 		}
-
 		return doubleJump;
 	}
 
