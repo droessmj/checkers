@@ -265,8 +265,12 @@ $("#myCanvas").click(function(event){
 					//check for double jump
 					if(checkerSelected.getJustJumped() && checkerSelected.checkDouble()){
 						//force current checker to stay selected
-
+						checkerSelected.setForce(true);
+						checkerSelected.select();
+						previousSquare = checkerSelected.findSquare();
 					}else{
+						//remove force
+						checkerSelected.setForce(false);
 						//no double jump opportunity
 						if(turn == "black"){
 							turn = "red";
@@ -288,13 +292,13 @@ $("#myCanvas").click(function(event){
 
 			if((mouseX > redChecker.getX()-45 && mouseX < redChecker.getX() + 45) && (mouseY > redChecker.getY()-45 && mouseY < redChecker.getY() + 45)){
 				//highlight the circle
-				if(redChecker.isSelected()){
+				if(redChecker.isSelected() && !redChecker.getForce()){
 					redChecker.unselect();
 					selected = false;
 				}				
 			}else if((mouseX > blackChecker.getX()-45) && (mouseX < (blackChecker.getX() + 45)) && (mouseY > blackChecker.getY()-45) && (mouseY < blackChecker.getY() + 45)){
 				//highlight the circle
-				if(blackChecker.isSelected()){
+				if(blackChecker.isSelected() && !blackChecker.getForce()){
 					blackChecker.unselect();
 					selected = false;
 				}
@@ -307,7 +311,7 @@ $("#myCanvas").click(function(event){
 
 </script>
 
-<p> TODO: Force selected checker to stay selected after doublejump. Perfect king movement and jumping. Add AI. Add loss if turn cannot move at all </p>
+<p> TODO: Perfect king movement and jumping. Add AI. Add loss if turn cannot move at all </p>
 
 </body>
 </html>

@@ -6,6 +6,7 @@ function Checker(x,y,color,currentSquare){
 	this.currentSquare = "";
 	this.selected = false;
 	this.justJumped = false;
+	this.force = false;
 
 	this.draw = function(){
 		ctx.beginPath();
@@ -25,6 +26,14 @@ function Checker(x,y,color,currentSquare){
       		ctx.stroke();
 			}
 		}		
+	}
+
+	this.getForce = function(){
+		return this.force;
+	}
+
+	this.setForce = function(parameter){
+		this.force = parameter;
 	}
 
 	this.getJustJumped = function(){
@@ -53,11 +62,12 @@ function Checker(x,y,color,currentSquare){
 
 			if((currentSquareNum+7 < 32)){
 				newSquareNum = currentSquareNum+7;
-				newSquare = playableSquares[newSquareNum];	
+				newSquare = playableSquares[newSquareNum];
+				console.log(currentSquareNum + " " + a);	
 			}else{
 				return false;
 			}
-
+			
 			if((newSquareNum == (currentSquareNum + 7) 
 				&& !playableSquares[currentSquareNum+a].isEmpty()) && newSquare.isEmpty()){
 				doubleJump = true;
@@ -69,6 +79,7 @@ function Checker(x,y,color,currentSquare){
 			if((currentSquareNum+9 < 32)){
 				newSquareNum = currentSquareNum+9;
 				newSquare = playableSquares[newSquareNum];
+				console.log(currentSquareNum + " " + b);
 			}else{
 				return false;
 			}
