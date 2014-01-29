@@ -86,14 +86,14 @@ function checkGameStatus(){
 	if(redRemaining == 0){
 		//display black wins
 		alert("Black player wins!");
+		location.reload();
 	}
 	else if(blackRemaining == 0){
 		//display red wins
 		alert("Red player wins!");
-
-	}else{
-		
+		location.reload();
 	}
+	
 }
 
 
@@ -307,7 +307,7 @@ $("#myCanvas").click(function(event){
 
 </script>
 
-<p> TODO: Force selected checker to stay selected after doublejump. Perfect king movement and jumping. Add AI </p>
+<p> TODO: Force selected checker to stay selected after doublejump. Perfect king movement and jumping. Add AI. Add loss if turn cannot move at all </p>
 
 </body>
 </html>
