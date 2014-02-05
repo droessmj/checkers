@@ -1,6 +1,5 @@
 checkers
 ========
 
-HTML5 Checkers
+HTML5 checker game in JavaScript with Canvas
 
-Test
