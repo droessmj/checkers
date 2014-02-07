@@ -3,11 +3,12 @@ function PlayableSquare(x,y,w,h, number){
 	this.y = y;
 	this.w = w;
 	this.h = h;
-	this.checker = "";
+	this.checker = {};
 	this.squareNumber = number;
 
 	this.isEmpty = function(){
-		return (this.checker == "");
+		//return the opposite of "does this object have a color property set?"
+	    return !this.checker.hasOwnProperty('color');
 	}
 
 	this.placeChecker = function(checker){
@@ -15,7 +16,7 @@ function PlayableSquare(x,y,w,h, number){
 	}
 
 	this.removeChecker = function(){
-		this.checker = ""
+		this.checker = {};
 		ctx.fillStyle = "black";
 		ctx.fillRect(this.x, this.y, this.w, this.h);
 	}
