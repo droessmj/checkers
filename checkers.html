@@ -33,26 +33,30 @@
 
       	#canvasDiv {
       		width:  720px;
-      		margin: 0 auto;
-
+      		margin: auto;
       	}
 
       	#redText {
       		float:left;
+            font-size: 20px;
       	}
       	#blackText {
       		float:right;
-      	}
+            font-size: 20px;
+        }
 
 
 	</style>
 </head>
 
 <body>
-	
-	<div id="canvasDiv">
-		<canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
-	</div>
+	<div id="container">
+        <div id="turnText">Black's Turn</div>
+        <div id="canvasDiv">
+            <canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
+        </div>
+       
+    </div>
 	
 	<div id="redText">
 		<font color="red"> Red Player: 12 remaining, 0 king(s)</font>
@@ -60,7 +64,7 @@
 	<div id="blackText">
 		Black Player: 12 remaining, 0 king(s)
 	</div>	
-	<div id="turnText">Black's Turn</div>
+	
 
 
 
@@ -240,10 +244,11 @@ for(var i=0; i<8; i++){
 
 
 //tracks whether a checker is currently selected or not
-var selected = false;
-var checkerSelected = {};
-var previousSquare = "";
-var turn = "black";
+var selected = false,
+    checkerSelected = {},
+    previousSquare = "",
+    turn = "black",
+    ai = false;
 
 //create listener for playing the game
 $("#myCanvas").click(function(event){
@@ -339,8 +344,20 @@ $("#myCanvas").click(function(event){
 		}	
 	}
 	checkGameStatus();
+    
+    //if the game is not being played against AI, package the game and send to other player
+    if(ai == false){
+        packageGame();
+        passGame();   
+    }
 });
 
+function passGame(){
+    
+}
+function packageGame(){
+    
+}
 
 </script>
 

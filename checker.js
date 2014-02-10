@@ -233,9 +233,12 @@ function Checker(x,y,color,currentSquare){
 		}
 
 		else if( this.king == true){
-			//need to determine direction
-			this.checkDirectionSwap(this.currentSquare, newSquareNum);
-
+            
+            //need to determine direction
+			a = this.rowCheck(this.currentSquare, newSquareNum);
+            b = this.getB(a);
+            //console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+            
 			//kinged can move to [spot +4,5] if adjacent and empty
 			if((newSquareNum == (currentSquareNum + a) || newSquareNum == (currentSquareNum + b)) && newSquare.isEmpty()){
 				moveValid = true;
@@ -245,15 +248,17 @@ function Checker(x,y,color,currentSquare){
 				moveValid = true;
 				this.currentSquare = newSquareNum;
 			}
-
+            
 			//kinged can move to [spot +7,9] if black on [spot +4,5]
 			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) 
 				|| (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty())) && newSquare.isEmpty()){
 				
 				moveValid = true;
 				this.currentSquare = newSquareNum;
-
-				var checkerJumped = {};
+                
+                //console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+				
+                var checkerJumped = {};
 				//remove jumped checker from square
 				if(newSquareNum == currentSquareNum+7){
 					checkerJumped = getCheckerBySquareNum(currentSquareNum+a);
@@ -272,7 +277,9 @@ function Checker(x,y,color,currentSquare){
 				
 				moveValid = true;
 				this.currentSquare = newSquareNum;
-
+                
+                //console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+                
 				var checkerJumped = {};
 				//remove jumped checker from square
 				if(newSquareNum == currentSquareNum-7){
@@ -291,38 +298,44 @@ function Checker(x,y,color,currentSquare){
 		return moveValid;
 	}
 
-	this.checkDirectionSwap = function(currentSquareNum, newSquareNum){
-		if(currentSquareNum > newSquareNum){
-			a = 4;
-			b = 5;
-		}else{
-			a = 3;
-			b = 4;
-		}		
-	}
-
-	this.rowCheck = function(currentSquareNum){
+	this.rowCheck = function(currentSquareNum, newSquareNum){
 		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 
 			|| Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
-			
-			a = 3;
-			b = 4;
+
+            if(currentSquareNum > newSquareNum){
+                a = 4;
+            }else{
+                a = 3;
+            }		
 		}else{
-			a = 4;
-			b = 5;
-		}
+            if(currentSquareNum < newSquareNum){
+                a = 4;
+            }else{
+                a = 3;
+            }
+        }
+		return a;
 	}
+        
+    this.getB = function(a){
+        if (a==3){
+            return 4;
+        }else{
+            return 5;
+        }
+    }
 
 
 	//check if there is opportunity for a double jump
 	//if there is, do not end turn until jump occurs
 	this.checkDouble = function(){
 		
-		var doubleJump = false;
-		var currentSquareNum= this.currentSquare;
+		var doubleJump = false,
+            currentSquareNum= this.currentSquare;
 		//determine which row the piece is currently on
-		this.rowCheck(currentSquareNum);
-
+		a = this.rowCheck(currentSquareNum);
+        b = this.getB(a);
+        
 		//handle red pieces jumping
 		if (this.color == "red" && this.king == false){
 			var newSquareNum = 0;
@@ -379,10 +392,10 @@ function Checker(x,y,color,currentSquare){
 		//handle kings double jumps -- HEADACHES ALL AROUND
 		else if(this.king == true){
 
-			var newSquareNum = 0;
-			var newSquare = {};
-			var jumpSquare = {};
-			var opposite = "";
+			var newSquareNum = 0,
+                newSquare = {},
+                jumpSquare = {},
+                opposite = "";
 
 			//set opposite colors based on current color
 			if (this.color == "red"){
@@ -393,49 +406,53 @@ function Checker(x,y,color,currentSquare){
 
 			if((currentSquareNum-7 > -1)){
 				newSquareNum = currentSquareNum-7;
+                a = this.rowCheck(currentSquareNum, newSquareNum);
+                b = this.getB(a);
 				newSquare = playableSquares[newSquareNum];
 				jumpSquare = playableSquares[currentSquareNum-a];
-				//this.checkDirectionSwap();
-				this.rowCheck(currentSquareNum);
+
 				if((!jumpSquare.isEmpty()) && jumpSquare.checker.color == opposite && newSquare.isEmpty()){
 					doubleJump = true;
-					console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+					//console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
 				}
 			}
 
 			if((currentSquareNum-9 > -1)){
 				newSquareNum = currentSquareNum-9;
-				newSquare = playableSquares[newSquareNum];
+                a = this.rowCheck(currentSquareNum, newSquareNum);
+				b = this.getB(a);
+                newSquare = playableSquares[newSquareNum];
 				jumpSquare = playableSquares[currentSquareNum-b];
-				//this.checkDirectionSwap();
-				this.rowCheck(currentSquareNum);
+
 				if((!jumpSquare.isEmpty()) && jumpSquare.checker.color == opposite && newSquare.isEmpty()){
 					doubleJump = true;
-					console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+					//console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
 				}
 			}
 
 			if((currentSquareNum+7 < 32)){
 				newSquareNum = currentSquareNum+7;
+                a = this.rowCheck(currentSquareNum, newSquareNum);
+                b = this.getB(a);
 				newSquare = playableSquares[newSquareNum];
 				jumpSquare = playableSquares[currentSquareNum+a];
-				//this.checkDirectionSwap();
-				this.rowCheck(currentSquareNum);
+
 				if((!jumpSquare.isEmpty()) && jumpSquare.checker.color == opposite && newSquare.isEmpty()){
 					doubleJump = true;
-					console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+					//console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
 				}
 			}
 
 			if((currentSquareNum+9 < 32)){
 				newSquareNum = currentSquareNum+9;
+                a = this.rowCheck(currentSquareNum, newSquareNum);
+                b = this.getB(a);
 				newSquare = playableSquares[newSquareNum];
 				jumpSquare = playableSquares[currentSquareNum+b];
-				//this.checkDirectionSwap();
-				this.rowCheck(currentSquareNum);
+
 				if((!jumpSquare.isEmpty()) && jumpSquare.checker.color == opposite && newSquare.isEmpty()){
 					doubleJump = true;
-					console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
+					//console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
 				}
 			}
 		}
