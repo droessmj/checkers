@@ -2,72 +2,52 @@
 <html>
 <head>
 	<title>HTML5 Checkers</title>
-	<style type="text/css">
-		html, body {
-		  width:  95%;
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'></link>
+    
+    <link href='http://fonts.googleapis.com/css?family=Russo+One' rel='stylesheet' type='text/css'>
+    
+    <style>
+        body {
+		  width:  90%;
 		  height: 100%;
-		  margin: 0px;
-		  background-color: #A6A6A6;
+		  margin: 0px auto;
+          font-family: 'Open Sans', sans-serif;
 		}
-
-		table {
-		   width: 100%;
-		   padding-top: 20px;
-		   text-align:center;
-		}
-
-		td[rowspan] {
-			vertical-align: top;
-			text-align: left;
-		}
-
-		canvas {
-        	background-color: black;
-        	display: inline;
-      	}
-
-      	#turnText {
-      		text-align: center;
-      		font-size: 25px;
-      	}
-
-      	#canvasDiv {
-      		width:  720px;
-      		margin: auto;
-      	}
-
-      	#redText {
-      		float:left;
-            font-size: 20px;
-      	}
-      	#blackText {
-      		float:right;
-            font-size: 20px;
-        }
-
-
-	</style>
+    </style>
+    
 </head>
 
 <body>
+    
+    <div id="formDiv">
+    <div id="innerDiv">
+        <form onsubmit="return setOpponent()" name="opponentSelect">
+            Select your opponent: <br>
+            <input type="radio" name="opponentSelect" value="AI">AI<br>
+            <input type="radio" name="opponentSelect" value="Person">Person<br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    </div>
+    
+    
 	<div id="container">
         <div id="turnText">Black's Turn</div>
         <div id="canvasDiv">
             <canvas id="myCanvas" width="720" height="720"> Your browser does not support Canvas</canvas>
         </div>
-       
+        <div id="colorText">
+            <div id="redText">
+                <font color="red"> Red Player: <br> 12 remaining <br> 0 kings</font>
+            </div>
+            <div id="blackText">
+                Black Player: <br> 12 remaining <br> 0 kings
+            </div>
+        </div>
+        <br/>
+        <p><center>TODO: Node js server. Add AI. </center></p>
     </div>
-	
-	<div id="redText">
-		<font color="red"> Red Player: 12 remaining, 0 king(s)</font>
-	</div>
-	<div id="blackText">
-		Black Player: 12 remaining, 0 king(s)
-	</div>	
-	
-
-
-
 
 
 
@@ -75,9 +55,27 @@
 <script src="checker.js"></script>
 <script src="playablesquare.js"></script>
 <script>
-
+    
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
+    
+var opponentAI = false;
+function setOpponent(){
+    var radio = document.forms[0].elements["opponentSelect"];
+ 
+    for(var i = 0; i < radio.length; i++){
+       if(radio[i].checked)
+       {
+         if(radio[i].value == "AI"){
+             opponentAI = true;
+         }
+       }
+    }
+    document.getElementById("container").style.display= "inline";
+    document.getElementById("formDiv").style.display="none";
+    return false;
+}
+    
 
 function getCheckerBySquareNum(num){
 	var checker = "";
@@ -146,10 +144,19 @@ function changeTurnText(s){
 	}
 	$("#turnText").html(s + "\'s turn");
 
+    var redKingText = "kings";
+    if(redKings == 1){
+        redKingText = "king";   
+    }
+    var blackKingText = "kings";
+    if(blackKings == 1){
+        blackKingText = "king";
+    }
+    
 	//update number of pieces and kings remaining for each player
 	$("#redText").css('color', 'red');
-	$("#redText").html("Red Player: " + redRemaining + " remaining, " + redKings + " king(s)");
-	$("#blackText").html("Black Player: " + blackRemaining + " remaining, " + blackKings + " king(s)");
+	$("#redText").html("Red Player: <br>" + redRemaining + " remaining <br> " + redKings + " " + redKingText);
+	$("#blackText").html("Black Player: <br>" + blackRemaining + " remaining <br> " + blackKings + " " + blackKingText);
 }
 
 function handleScreenSize(mouseX, mouseY){
@@ -346,7 +353,7 @@ $("#myCanvas").click(function(event){
 	checkGameStatus();
     
     //if the game is not being played against AI, package the game and send to other player
-    if(ai == false){
+    if(opponentAI == false){
         packageGame();
         passGame();   
     }
@@ -361,7 +368,7 @@ function packageGame(){
 
 </script>
 
-<p> TODO: Handle kings extra move. Add loss if turn cannot move at all. Node js server. Add AI. </p>
+
 
 </body>
 </html>

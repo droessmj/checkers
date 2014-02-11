@@ -7,16 +7,39 @@ function Checker(x,y,color,currentSquare){
 	this.selected = false;
 	this.justJumped = false;
 	this.force = false;
-
+    this.kingImage = new Image();
+    
+    
 	this.draw = function(){
 		ctx.beginPath();
 		ctx.fillStyle= this.color;
 		ctx.arc(this.x,this.y,40,0,2*Math.PI);
 		ctx.fill();
-		if(this.king == true){
+		
+        if(this.king == true){
+            if(this.kingImage.src == ""){
+                //set the color of the crown to load
+                var oppositeColor = "";
+                if(this.color == "red"){
+                    oppositeColor = "black";
+                }else{
+                    oppositeColor = "red";
+                }
+                this.kingImage.src="Images/"+oppositeColor+"_crown.gif";
+                var imageObj = this.kingImage;
+                var xPass = this.x - 25;
+                var yPass = this.y - 24;
+                imageObj.onload = function() {
+                    ctx.drawImage(imageObj,xPass, yPass);
+              };
+            }else{
+                ctx.drawImage(this.kingImage, this.x-25, this.y-24);   
+            }
+            
 			ctx.strokeStyle = "purple";
 			ctx.lineWidth=4;
 	      	ctx.stroke();
+            
 		}else{
 			if(color == "black"){
 			ctx.lineWidth=2;

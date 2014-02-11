@@ -1,0 +1,56 @@
+<style type="text/css">
+		
+        body {
+		  width:  90%;
+		  height: 100%;
+		  margin: 0px auto;
+          font-family: 'Open Sans', sans-serif;
+		}
+
+		canvas {
+        	background-color: black;
+            box-shadow: 0 0 10px 5px #000;
+      	}
+
+      	#turnText {
+      		text-align: center;
+      		font-size: 25px;
+      	}
+
+      	#canvasDiv {
+      		width:  720px;
+      		margin: auto;
+      	}
+
+      	#redText {
+            margin-top: 10px;
+      		float:left;
+            font-size: 20px;
+      	}
+      	#blackText {
+            margin-top: 10px;
+      		float:right;
+            font-size: 20px;
+        }
+        #container{
+            display: none;
+        }     
+        #formDiv{
+            width: 250px;
+            height: 150px;
+            margin: 30px auto 0px auto;
+            box-shadow: 10px 10px 10px #888888;
+            background-color: #FF0000;
+        }
+        #innerDiv{
+            width:  200px;
+            margin: 0px auto;
+            padding-top: 30px;
+            padding-left: 25px;
+        }
+        #colorText{
+            width: 60%;  
+            margin: 0px auto;
+        }
+
+</style>
