@@ -26,7 +26,8 @@
             Select your opponent: <br>
             <input type="radio" name="opponentSelect" value="AI">AI<br>
             <input type="radio" name="opponentSelect" value="Person">Person<br>
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit"><br>
+            -Currently no opponents-
         </form>
     </div>
     </div>
@@ -60,6 +61,8 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
     
 var opponentAI = false;
+var turnUser = true;
+    
 function setOpponent(){
     var radio = document.forms[0].elements["opponentSelect"];
  
@@ -259,7 +262,10 @@ var selected = false,
 
 //create listener for playing the game
 $("#myCanvas").click(function(event){
-
+//always have turn on while testing
+turnUser = true;
+    
+ if (turnUser == true){
 	var mouseX = event.clientX;
 	var mouseY = event.clientY;
 	var adjustedMouseOutput = handleScreenSize(mouseX, mouseY);
@@ -351,18 +357,26 @@ $("#myCanvas").click(function(event){
 		}	
 	}
 	checkGameStatus();
-    
+    //change whose turn it is
+    turnUser = false;
+          
     //if the game is not being played against AI, package the game and send to other player
-    if(opponentAI == false){
-        packageGame();
-        passGame();   
+    if(opponentAI == true){
+        passGameAI(playableSquares, redCheckers, blackCheckers);
+        //wait for response
+    }else{
+        passGamePerson(playableSquares, redCheckers, blackCheckers);    
     }
+ }
 });
 
-function passGame(){
+//pass the game to the AI to make a move
+function passGameAI(playableSquares, redCheckers, blackCheckers){
     
 }
-function packageGame(){
+
+//the the game to the server to hand off to the opponent
+function passGamePerson(playableSquares, redCheckers, blackCheckers){
     
 }
 
