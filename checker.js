@@ -180,8 +180,8 @@ function Checker(x,y,color,currentSquare){
 				}	
 			}
 			//red, not kinged can move to [spot +7,9] if black on [spot +4,5]
-			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) 
-				|| (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty())) && newSquare.isEmpty()){
+			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()&& playableSquares[currentSquareNum+a].checker.color == "black") 
+				|| ((newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty()))  && playableSquares[currentSquareNum+b].checker.color == "black") && newSquare.isEmpty()){
 					moveValid = true;
 				this.currentSquare = newSquareNum;
 
@@ -228,8 +228,8 @@ function Checker(x,y,color,currentSquare){
 				}	
 			}
 			//black, not kinged can move to [spot +7,9] if black on [spot +4,5]
-			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) 
-				|| (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty())) && newSquare.isEmpty()){
+			else if((((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty())  && playableSquares[currentSquareNum-a].checker.color == "red")
+				|| ((newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty() && playableSquares[currentSquareNum-b].checker.color == "red"))) && newSquare.isEmpty()){
 					moveValid = true;
 				this.currentSquare = newSquareNum;
 
@@ -260,6 +260,12 @@ function Checker(x,y,color,currentSquare){
             //need to determine direction
 			a = this.rowCheck(this.currentSquare, newSquareNum);
             b = this.getB(a);
+			var opposite;
+			if (this.color == "red"){
+				opposite = "black";
+			}else{
+				opposite = "red";	
+			}
             //console.log(a + " " + b + " " + currentSquareNum + " " + newSquareNum);
             
 			//kinged can move to [spot +4,5] if adjacent and empty
@@ -273,8 +279,8 @@ function Checker(x,y,color,currentSquare){
 			}
             
 			//kinged can move to [spot +7,9] if black on [spot +4,5]
-			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty()) 
-				|| (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty())) && newSquare.isEmpty()){
+			else if(((newSquareNum == (currentSquareNum + 7) && !playableSquares[currentSquareNum+a].isEmpty() && playableSquares[currentSquareNum+a].checker.color == opposite) 
+				|| (newSquareNum == (currentSquareNum + 9) && !playableSquares[currentSquareNum+b].isEmpty()) && playableSquares[currentSquareNum+b].checker.color == opposite) && newSquare.isEmpty()){
 				
 				moveValid = true;
 				this.currentSquare = newSquareNum;
@@ -295,8 +301,8 @@ function Checker(x,y,color,currentSquare){
 					playableSquares[currentSquareNum+b].checker = {};
 				}
 			}
-			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty()) 
-				|| (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty())) && newSquare.isEmpty()){
+			else if(((newSquareNum == (currentSquareNum - 7) && !playableSquares[currentSquareNum-a].isEmpty() && playableSquares[currentSquareNum-a].checker.color == opposite) 
+				|| (newSquareNum == (currentSquareNum - 9) && !playableSquares[currentSquareNum-b].isEmpty())&& playableSquares[currentSquareNum-b].checker.color == opposite) && newSquare.isEmpty()){
 				
 				moveValid = true;
 				this.currentSquare = newSquareNum;
@@ -384,14 +390,6 @@ function Checker(x,y,color,currentSquare){
 		//handle black pieces jumping
 		else if(this.color == "black" && this.king == false){
 			//direction based swap due to black coming the other direction
-			if(a == 4 && b == 5){
-				a = 3;
-				b = 4;
-			}else{
-				a = 4;
-				b = 5;
-			}
-
 			var newSquareNum = 0;
 			var newSquare = {};
 			var jumpSquare = {};
