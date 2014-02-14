@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>HTML5 Checkers</title>
+	<title>Checkers</title>
+	<link rel="shortcut icon" href="Images/favicon.ico" />
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'></link>
     
@@ -24,7 +25,7 @@
     <div id="innerDiv">
         <form onsubmit="return setOpponent()" name="opponentSelect">
             Select your opponent: <br>
-            <input type="radio" name="opponentSelect" value="AI">AI<br>
+            <input type="radio" name="opponentSelect" value="AI">Computer<br>
             <input type="radio" name="opponentSelect" value="Person">Person<br>
             <input type="submit" value="Submit"><br>
             -Currently no opponents-
@@ -55,12 +56,14 @@
 <script src="jquery.js"></script>
 <script src="checker.js"></script>
 <script src="playablesquare.js"></script>
+<script src="ai.js"></script>
 <script>
     
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
     
 var opponentAI = false;
+var opponent = {};
 var turnUser = true;
     
 function setOpponent(){
@@ -70,12 +73,19 @@ function setOpponent(){
        if(radio[i].checked)
        {
          if(radio[i].value == "AI"){
-             opponentAI = true;
+            opponentAI = true;
          }
        }
     }
     document.getElementById("container").style.display= "inline";
     document.getElementById("formDiv").style.display="none";
+    if(opponentAI == true){
+    	opponent = new AI();
+    }else{
+    	opponent = "";
+    }
+
+
     return false;
 }
     
@@ -359,25 +369,33 @@ turnUser = true;
 	checkGameStatus();
     //change whose turn it is
     turnUser = false;
-          
+    var nextGameBoard = {};
+    var diff = {};
     //if the game is not being played against AI, package the game and send to other player
     if(opponentAI == true){
-        passGameAI(playableSquares, redCheckers, blackCheckers);
-        //wait for response
+        nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers);
     }else{
-        passGamePerson(playableSquares, redCheckers, blackCheckers);    
+        //nextGameBoard = oopenent.passGamePerson(playableSquares, redCheckers, blackCheckers);    
+    }
+    if (nextGameBoard != ""){
+    	checkGameStatus();
+    	diff = compareGames(playableSquares, nextGameBoard);
+    	gameDraw(diff);
+    	turnUser = true;
     }
  }
 });
 
-//pass the game to the AI to make a move
-function passGameAI(playableSquares, redCheckers, blackCheckers){
-    
+//redraw the game once opponent returns
+function gameDraw(nextGameBoard){
+
+	return false;
 }
 
-//the the game to the server to hand off to the opponent
-function passGamePerson(playableSquares, redCheckers, blackCheckers){
-    
+function compareGames(playableSquares, nextGameBoard){
+
+
+	return false;
 }
 
 </script>
