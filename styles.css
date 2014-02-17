@@ -1,6 +1,6 @@
 <style type="text/css">
 		
-        body {
+    body {
 		  width:  90%;
 		  height: 100%;
 		  margin: 0px auto;
@@ -34,7 +34,7 @@
             font-size: 20px;
         }
         #container{
-            display: none;
+            /*display: none;*/
         }     
         #formDiv{
             width: 250px;

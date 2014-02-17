@@ -49,6 +49,10 @@ function Checker(x,y,color,currentSquare){
 		}		
 	}
 
+	this.getColor = function(){
+		return this.color;
+	}
+
 	this.getForce = function(){
 		return this.force;
 	}
@@ -478,6 +482,45 @@ function Checker(x,y,color,currentSquare){
 			}
 		}
 		return doubleJump;
+	}
+
+	this.hasMoveAvailable = function(checker, playableSquares, turn){
+
+		var newPlayableSquares = playableSquares;
+
+		var currentSquareNum = checker.findSquare().getSquareNumber();
+		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 
+			|| Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
+				
+			a = 3;
+			b = 4;
+		}else{
+			a = 4;
+			b = 5;
+		}
+		var movePossible = false;
+		if(checker.isKing()){
+			if(checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]) 
+				|| checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b])){
+				movePossible = true;
+			}
+		}else if(turn == "red" && this.king == false && (checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]))){
+				movePossible = true;
+		}else if(turn == "black" && this.king == false && (checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b]))){
+				movePossible = true;
+		}
+
+		return movePossible;
+	}
+
+	//make each move available to the checker when given a game board and return an array of the next game boards
+	this.makeAllMoves = function(){
+		var gameBoardArray = [];
+		
+		
+
+
+		return gameBoardArray;
 	}
 
 

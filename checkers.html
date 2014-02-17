@@ -20,7 +20,8 @@
 </head>
 
 <body>
-    
+   
+   <!--
     <div id="formDiv">
     <div id="innerDiv">
         <form onsubmit="return setOpponent()" name="opponentSelect">
@@ -32,6 +33,7 @@
         </form>
     </div>
     </div>
+-->
     
     
 	<div id="container">
@@ -57,14 +59,19 @@
 <script src="checker.js"></script>
 <script src="playablesquare.js"></script>
 <script src="ai.js"></script>
+<script src="gameboard.js"></script>
 <script>
     
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
     
-var opponentAI = false;
+var opponentAI = true;
 var opponent = {};
 var turnUser = true;
+
+
+opponent = new AI();
+opponent.setColor("red");
     
 function setOpponent(){
     var radio = document.forms[0].elements["opponentSelect"];
@@ -81,6 +88,7 @@ function setOpponent(){
     document.getElementById("formDiv").style.display="none";
     if(opponentAI == true){
     	opponent = new AI();
+    	opponent.setColor("red");
     }else{
     	opponent = "";
     }
@@ -117,26 +125,7 @@ function checkGameStatus(){
 }
 
 function checkNoMoveAvail(checker, playableSquares){
-	var currentSquareNum = checker.findSquare().getSquareNumber();
-	if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 
-		|| Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
-			
-		a = 3;
-		b = 4;
-	}else{
-		a = 4;
-		b = 5;
-	}
-	var movePossible = false;
-	if(checker.isKing()){
-		if(checker.move(playableSquares, playableSquares[currentSquareNum+a]) || checker.move(playableSquares, playableSquares[currentSquareNum+b]) || checker.move(playableSquares, playableSquares[currentSquareNum-a]) || checker.move(playableSquares, playableSquares[currentSquareNum-b])){
-			movePossible = true;
-		}
-	}else if(turn == "red" && checker.move(playableSquares, playableSquares[currentSquareNum+a]) || checker.move(playableSquares, playableSquares[currentSquareNum+b])){
-			movePossible = true;
-	}else if(checker.move(playableSquares, playableSquares[currentSquareNum-a]) || checker.move(playableSquares, playableSquares[currentSquareNum-b])){
-			movePossible = true;
-	}
+	var movePossible = checker.hasMoveAvailable(checker, playableSquares);
 
 	if (movePossible == false){
 		if(turn == "red"){
@@ -272,8 +261,8 @@ var selected = false,
 
 //create listener for playing the game
 $("#myCanvas").click(function(event){
-//always have turn on while testing
-turnUser = true;
+	//always have turn on while testing
+	turnUser = true;
     
  if (turnUser == true){
 	var mouseX = event.clientX;
@@ -340,6 +329,7 @@ turnUser = true;
 							turn = "black";
 							changeTurnText("Black");
 						}
+						userMoveMade();
 					}
 				}
 				break
@@ -366,36 +356,41 @@ turnUser = true;
 			}
 		}	
 	}
+ }
+});
+
+//redraw the game once opponent returns
+function gameDraw(nextGameBoard){
+	nextGameBoard.getPlayableSquares().forEach(function(gameSquare){
+		gameSquare.draw();
+		if(!gameSquare.isEmpty()){
+			var checker = gameSquare.getChecker();
+			checker.draw();
+		}
+	});
+}
+
+
+function userMoveMade(){
 	checkGameStatus();
     //change whose turn it is
     turnUser = false;
-    var nextGameBoard = {};
-    var diff = {};
+    
+    var nextGameBoard = [];
+    var diff = [];
+    
     //if the game is not being played against AI, package the game and send to other player
     if(opponentAI == true){
         nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers);
     }else{
         //nextGameBoard = oopenent.passGamePerson(playableSquares, redCheckers, blackCheckers);    
     }
-    if (nextGameBoard != ""){
+    if (nextGameBoard.hasOwnProperty('points')){
     	checkGameStatus();
-    	diff = compareGames(playableSquares, nextGameBoard);
-    	gameDraw(diff);
-    	turnUser = true;
+    	gameDraw(nextGameBoard);
+    	
     }
- }
-});
-
-//redraw the game once opponent returns
-function gameDraw(nextGameBoard){
-
-	return false;
-}
-
-function compareGames(playableSquares, nextGameBoard){
-
-
-	return false;
+    turnUser = true;
 }
 
 </script>

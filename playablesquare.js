@@ -48,4 +48,14 @@ function PlayableSquare(x,y,w,h, number){
 	this.getSquareNumber = function(){
 		return this.squareNumber;
 	}
+
+	this.draw = function(){
+		ctx.fillStyle = "black";
+		ctx.fillRect(this.x, this.y,90,90);
+	}
+
+	this.getChecker = function(){
+		return this.checker;
+	}
+
 }
