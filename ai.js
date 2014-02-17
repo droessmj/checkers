@@ -3,7 +3,6 @@ function AI(){
 	this.playableSquares = [];
 	this.redCheckers = [];
 	this.blackCheckers = [];
-	this.bestGameBoard = {};
 	this.MAX_DEPTH = 5;
 
 	this.setColor = function(color){
@@ -17,23 +16,22 @@ function AI(){
 		this.redCheckers = jQuery.extend(true, [], redCheckers);
 		this.blackCheckers = jQuery.extend(true, [], blackCheckers);
 
-		//create multiple threads to go off and play the potential games
-		this.bestGameBoard = this.calculateBestMove(0, this.playableSquares, this.redCheckers, this.blackCheckers);
+		gameBoard = new GameBoard(this.playableSquares);
 
 		//return the gameboard that optimizes play for the CPU
-		return this.bestGameBoard;
+		return this.calculateBestMove(0, gameBoard, this.redCheckers, this.blackCheckers);;
 	}
 
 	//return the number of moves available to the game 
-	this.calculateBestMove = function(level, playableSquares, redCheckers, blackCheckers){
+	this.calculateBestMove = function(level, gameBoard, redCheckers, blackCheckers){
 
 		if(level > this.MAX_DEPTH){
-			return playableSquares;
+			return gameBoard;
 		}else{
 			//set a variable that is the highest scoring game board
 			var bestBoard = {};
 
-			var squares = jQuery.extend(true, {}, playableSquares);
+			var squares = jQuery.extend(true, {}, gameBoard.getPlayableSquares());
 
 			//calculate which checkers can be moved to which spots
 			var movableCheckerArray = [];
@@ -73,11 +71,15 @@ function AI(){
 						}
 					});
 					//recursive call to self to evaluate to 5 levels
-					this.calculateBestMove(level+1, board, redCheckers, blackCheckers);
+					newGameBoard = this.calculateBestMove(level+1, board, redCheckers, blackCheckers);
+
+					//if(newGameBoard.getPoints > currentBestBoard.getPoints()){
+					//	currentBestBoard = newGameBoard;
+					//}
 				});				
 			});
 
-
+			return gameBoard;
 		}
 	}
 

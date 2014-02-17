@@ -1,6 +1,6 @@
-function GameBoard(){
+function GameBoard(playableSquares){
 	this.points = 0;
-	this.playableSquares = []
+	this.playableSquares = playableSquares;
 
 	this.incrementPoints = function(value){
 		this.points += value;
@@ -16,6 +16,10 @@ function GameBoard(){
 
 	this.getPlayableSquares = function(){
 		return playableSquares;
+	}
+
+	this.getPoints = function(){
+		return this.points;
 	}
 
 }

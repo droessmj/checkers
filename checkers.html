@@ -368,6 +368,7 @@ function gameDraw(nextGameBoard){
 			checker.draw();
 		}
 	});
+	console.log("draw called");
 }
 
 
@@ -376,7 +377,7 @@ function userMoveMade(){
     //change whose turn it is
     turnUser = false;
     
-    var nextGameBoard = [];
+    var nextGameBoard = {};
     var diff = [];
     
     //if the game is not being played against AI, package the game and send to other player
