@@ -28,10 +28,10 @@ function AI(){
 		if(level > this.MAX_DEPTH){
 			return gameBoard;
 		}else{
-			//set a variable that is the highest scoring game board
-			var bestBoard = {};
 
-			var squares = jQuery.extend(true, {}, gameBoard.getPlayableSquares());
+			var squares = jQuery.extend(true, [], gameBoard.getPlayableSquares());
+			var newRedCheckers = jQuery.extend(true, [], redCheckers);
+			var newBlackCheckers = jQuery.extend(true, [], blackCheckers);
 
 			//calculate which checkers can be moved to which spots
 			var movableCheckerArray = [];
@@ -46,40 +46,67 @@ function AI(){
 			for (var i = 0; i < redCheckers.length; i++){
 				var movableChecker = {};
 				if(turn == "red"){
-					movableChecker = redCheckers[i];
+					movableChecker = newRedCheckers[i];
 				}else{
-					movableChecker = blackCheckers[i];
+					movableChecker = newBlackCheckers[i];
 				}
 					if(movableChecker.x != null){
 					var checker = jQuery.extend(true, {}, movableChecker);
-					if(movableChecker.hasMoveAvailable(checker, squares, turn)){
+					if(checker.hasMoveAvailable(squares, turn)){
 						movableCheckerArray.push(movableChecker);
 					}
 				}
 			}
 
+			var bestChecker = {};
+			var bestCheckerPoints = 0;
 			//for each movable checker, make each available move
 			movableCheckerArray.forEach(function(checker){
 				var allNewBoards = checker.makeAllMoves(squares);
+				var currentCheckerPoints = 0;
 				allNewBoards.forEach(function(board){
-					//after move is made, evaluate each gameboard
-					board.forEach(function(square){
-						if(square.getChecker().getColor() == turn){
+					//evaluate each new gameboard
+					//console.log(board);
+					board.getPlayableSquares().forEach(function(square){
+						
+						if(square.getChecker().color == turn){
 							board.incrementPoints(5);
+							currentCheckerPoints += 5;
 						}else{
 							board.decrementPoints(5);
+							currentCheckerPoints -= 5;
 						}
-					});
-					//recursive call to self to evaluate to 5 levels
-					newGameBoard = this.calculateBestMove(level+1, board, redCheckers, blackCheckers);
 
-					//if(newGameBoard.getPoints > currentBestBoard.getPoints()){
-					//	currentBestBoard = newGameBoard;
-					//}
-				});				
+					});
+					//console.log(board);
+					//recursive call to self to evaluate to 5 levels
+					//newGameBoard = this.calculateBestMove(level+1, board, redCheckers, blackCheckers);
+				});
+
+				if (!bestChecker.hasOwnProperty("color") || (currentCheckerPoints > bestCheckerPoints)){
+					bestChecker = checker;
+				}
+
 			});
 
-			return gameBoard;
+			console.log(bestChecker);
+			//once the best checker is found, select the best move and return that gameboard
+			var allNewBoards = bestChecker.makeAllMoves(squares);
+			var bestBoard = {};
+			allNewBoards.forEach(function(board){
+				board.getPlayableSquares().forEach(function(square){
+					if(square.getChecker().getColor() == turn){
+						board.incrementPoints(5);
+					}else{
+						board.decrementPoints(5);
+					}
+				});
+				if(!bestBoard.hasOwnProperty('points') || board.getPoints() > bestBoard.getPoints()){
+					bestBoard = board;
+				}
+			});
+			//console.log(bestBoard);
+			return bestBoard;
 		}
 	}
 
