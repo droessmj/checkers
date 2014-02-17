@@ -147,7 +147,7 @@ function Checker(x,y,color,currentSquare){
 		this.selected = false;
 	}
 
-	this.move = function(gameBoard, gameSquare){
+	this.move = function(playableSquares, gameSquare){
 		var moveValid = false;
 		var currentSquareNum = this.currentSquare;
 		var newSquareNum = gameSquare.getSquareNumber();
@@ -484,11 +484,11 @@ function Checker(x,y,color,currentSquare){
 		return doubleJump;
 	}
 
-	this.hasMoveAvailable = function(checker, playableSquares, turn){
+	this.hasMoveAvailable = function(playableSquares, turn){
 
-		var newPlayableSquares = playableSquares;
+		var newPlayableSquares = jQuery.extend(true, [], playableSquares);
 
-		var currentSquareNum = checker.findSquare().getSquareNumber();
+		var currentSquareNum = this.findSquare().getSquareNumber();
 		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 
 			|| Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
 				
@@ -499,14 +499,14 @@ function Checker(x,y,color,currentSquare){
 			b = 5;
 		}
 		var movePossible = false;
-		if(checker.isKing()){
-			if(checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]) 
-				|| checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b])){
+		if(this.isKing()){
+			if(this.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || this.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]) 
+				|| this.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || this.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b])){
 				movePossible = true;
 			}
-		}else if(turn == "red" && this.king == false && (checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]))){
+		}else if(turn == "red" && this.king == false && (this.move(newPlayableSquares, newPlayableSquares[currentSquareNum+a]) || this.move(newPlayableSquares, newPlayableSquares[currentSquareNum+b]))){
 				movePossible = true;
-		}else if(turn == "black" && this.king == false && (checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || checker.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b]))){
+		}else if(turn == "black" && this.king == false && (this.move(newPlayableSquares, newPlayableSquares[currentSquareNum-a]) || this.move(newPlayableSquares, newPlayableSquares[currentSquareNum-b]))){
 				movePossible = true;
 		}
 
@@ -514,10 +514,46 @@ function Checker(x,y,color,currentSquare){
 	}
 
 	//make each move available to the checker when given a game board and return an array of the next game boards
-	this.makeAllMoves = function(){
+	this.makeAllMoves = function(playableSquares){
+		
 		var gameBoardArray = [];
+		var squares = jQuery.extend(true, [], playableSquares);
 		
+		var currentSquareNum = this.findSquare().getSquareNumber();
+		if(Math.floor(currentSquareNum / 4) == 1 || Math.floor(currentSquareNum / 4) ==  3 
+			|| Math.floor(currentSquareNum / 4) == 5 || Math.floor(currentSquareNum / 4) == 7){
+				
+			a = 3;
+			b = 4;
+		}else{
+			a = 4;
+			b = 5;
+		}
 		
+		//current square +/- numbers
+		var possibleMoves = [];
+		if(this.king){
+			//all spaces are available
+			possibleMoves = new Array(a, b, (0-a), (0-b), 7, 9, -7, -9);
+		}else if(this.color == "red"){
+			//only positive
+			possibleMoves = new Array(a, b, 7, 9);
+		}else if(this.color == "black"){
+			//only negative
+			possibleMoves = new Array((0-a), (0-b), -7, -9);
+		}
+
+		//create a board for each possible move
+		for(var i=0; i<possibleMoves.length; i++){
+			newSquares = jQuery.extend(true, [], squares);
+			var checkSquareNum = this.currentSquare + possibleMoves[i];
+			var checkSquare = newSquares[checkSquareNum];
+			
+			if(this.move(squares, checkSquare)){
+				var newBoard = new GameBoard(newSquares);
+				gameBoardArray.push(newBoard);
+			}
+		}
 
 
 		return gameBoardArray;
