@@ -21,7 +21,6 @@
 
 <body>
    
-   <!--
     <div id="formDiv">
     <div id="innerDiv">
         <form onsubmit="return setOpponent()" name="opponentSelect">
@@ -33,7 +32,6 @@
         </form>
     </div>
     </div>
-	-->
     
     
 	<div id="container">
@@ -54,24 +52,50 @@
     </div>
 
 
-
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 <script src="jquery.js"></script>
 <script src="checker.js"></script>
 <script src="playablesquare.js"></script>
 <script src="ai.js"></script>
 <script src="gameboard.js"></script>
 <script>
+
+var socket = io.connect("http://localhost", {port:3000, transports:["websocket"]});
+
+function onSocketConnected() {
+    console.log("Connected to socket server");
+};
+
+function onSocketDisconnect() {
+    console.log("Disconnected from socket server");
+};
+
+function onNewPlayer(data) {
+    console.log("New player connected: "+data.id);
+};
+
+function onPlayerMove(data) {
+	var currentPlayableSquares = JSON.stringify(playableSquares);
+	if(!currentPlayableSquares == data){
+		onOpponentMove();
+	}
+};
+
+function onRemovePlayer(data) {
+
+};
+
     
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
     
-var opponentAI = true;
+var opponentAI = false;
 var opponent = {};
 var turnUser = true;
 
 
-opponent = new AI();
-opponent.setColor("red");
+//opponent = new AI();
+//opponent.setColor("red");
     
 function setOpponent(){
     var radio = document.forms[0].elements["opponentSelect"];
@@ -370,27 +394,28 @@ function gameDraw(nextGameBoard){
 	});
 }
 
+function onOpponentMove(nextGameBoard){
+    if (nextGameBoard.hasOwnProperty('points')){
+    	checkGameStatus();
+    	gameDraw(nextGameBoard);
+    }
+    //set the turn to be the user
+    turnUser = true;
+}
 
 function userMoveMade(){
 	checkGameStatus();
     //change whose turn it is
     turnUser = false;
     
-    var nextGameBoard = {};
-    var diff = [];
-    
+    var nextGameBoard = {};    
     //if the game is not being played against AI, package the game and send to other player
     if(opponentAI == true){
-        nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers);
-        console.log(nextGameBoard);
+        nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers).getPlayableSquares();
+        onOpponentMove(nextGameBoard);
     }else{
-        //nextGameBoard = oppenent.passGamePerson(playableSquares, redCheckers, blackCheckers);    
+		socket.emit("player move", JSON.stringify(playableSquares));
     }
-    if (nextGameBoard.hasOwnProperty('points')){
-    	checkGameStatus();
-    	gameDraw(nextGameBoard);
-    }
-    turnUser = true;
 }
 
 </script>

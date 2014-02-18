@@ -34,7 +34,7 @@
             font-size: 20px;
         }
         #container{
-            /*display: none;*/
+            display: none;
         }     
         #formDiv{
             width: 250px;
