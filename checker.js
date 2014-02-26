@@ -10,41 +10,54 @@ function Checker(x,y,color,currentSquare){
     this.kingImage = new Image();
     
     
-	this.draw = function(){
+	this.draw = function(size){
+		
+		//draw small checkers
 		ctx.beginPath();
 		ctx.fillStyle= this.color;
-		ctx.arc(this.x,this.y,40,0,2*Math.PI);
-		ctx.fill();
-		
-        if(this.king == true){
-            if(this.kingImage.src == ""){
-                //set the color of the crown to load
-                var oppositeColor = "";
-                if(this.color == "red"){
-                    oppositeColor = "black";
-                }else{
-                    oppositeColor = "red";
-                }
-                this.kingImage.src="Images/"+oppositeColor+"_crown.gif";
-                var imageObj = this.kingImage;
-                var xPass = this.x - 25;
-                var yPass = this.y - 24;
-                imageObj.onload = function() {
-                    ctx.drawImage(imageObj,xPass, yPass);
-              };
-            }else{
-                ctx.drawImage(this.kingImage, this.x-25, this.y-24);   
-            }
-            
-			ctx.strokeStyle = "purple";
-			ctx.lineWidth=4;
-	      	ctx.stroke();
-            
+
+		if(size != null){
+			newX = this.x * (size/720);
+			newY = this.y * (size/720);
+			ctx.arc(newX,newY,(size/18),0,2*Math.PI);
+		//draw regular checkers	
+		}else{
+			ctx.arc(this.x,this.y,40,0,2*Math.PI);
+	    }    
+	    ctx.fill();
+
+	    if(this.king == true){
+	        if(this.kingImage.src == ""){
+	            //set the color of the crown to load
+	            var oppositeColor = "";
+	            if(this.color == "red"){
+	                oppositeColor = "black";
+	            }else{
+	                oppositeColor = "red";
+	            }
+	            this.kingImage.src="Images/"+oppositeColor+"_crown.gif";
+	            var imageObj = this.kingImage;
+	            var xPass = this.x - 25;
+	            var yPass = this.y - 24;
+	            imageObj.onload = function() {
+	                ctx.drawImage(imageObj,xPass, yPass);
+	            };
+	        }else{
+	          ctx.drawImage(this.kingImage, this.x-25, this.y-24);   
+	        }
+
+			ctx.strokeStyle = "purple";	        
+	        if(size != null){
+	        	ctx.lineWidth=2;
+	        }else{
+				ctx.lineWidth=4;
+	        }    
+	        ctx.stroke();	
 		}else{
 			if(color == "black"){
-			ctx.lineWidth=2;
-			ctx.strokeStyle = "red";
-      		ctx.stroke();
+				ctx.lineWidth=2;
+				ctx.strokeStyle = "red";
+		    	ctx.stroke();
 			}
 		}		
 	}

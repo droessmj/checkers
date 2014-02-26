@@ -8,14 +8,7 @@
     
     <link href='http://fonts.googleapis.com/css?family=Russo+One' rel='stylesheet' type='text/css'>
     
-    <style>
-        body {
-		  width:  90%;
-		  height: 100%;
-		  margin: 0px auto;
-          font-family: 'Open Sans', sans-serif;
-		}
-    </style>
+
     
 </head>
 
@@ -52,38 +45,50 @@
     </div>
 
 
-<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+
 <script src="jquery.js"></script>
 <script src="checker.js"></script>
 <script src="playablesquare.js"></script>
 <script src="ai.js"></script>
 <script src="gameboard.js"></script>
+
+
+<!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
 <script>
 
-var socket = io.connect("http://localhost", {port:3000, transports:["websocket"]});
 
-function onSocketConnected() {
-    console.log("Connected to socket server");
-};
 
-function onSocketDisconnect() {
-    console.log("Disconnected from socket server");
-};
+//try{
+//	var socket = io.connect("http://localhost", {port:3000, transports:["websocket"]});
+//}catch(err){
+//	console.log(err);
+//}
 
-function onNewPlayer(data) {
-    console.log("New player connected: "+data.id);
-};
 
-function onPlayerMove(data) {
-	var currentPlayableSquares = JSON.stringify(playableSquares);
-	if(!currentPlayableSquares == data){
-		onOpponentMove();
-	}
-};
+//function onSocketConnected() {
+//    console.log("Connected to socket server");
+//};
 
-function onRemovePlayer(data) {
+//function onSocketDisconnect() {
+//    console.log("Disconnected from socket server");
+//};
 
-};
+//function onNewPlayer(data) {
+//    console.log("New player connected: "+data.id);
+//};
+
+//function onPlayerMove(data) {
+//	var currentPlayableSquares = JSON.stringify(playableSquares);
+//	if(!currentPlayableSquares == data){
+//		onOpponentMove();
+//	}
+//};
+
+//function onRemovePlayer(data) {
+//
+//};
+
+
 
     
 var canvas = document.getElementById("myCanvas");
@@ -92,10 +97,6 @@ var ctx = canvas.getContext("2d");
 var opponentAI = false;
 var opponent = {};
 var turnUser = true;
-
-
-//opponent = new AI();
-//opponent.setColor("red");
     
 function setOpponent(){
     var radio = document.forms[0].elements["opponentSelect"];
@@ -203,6 +204,22 @@ function handleScreenSize(mouseX, mouseY){
 	return outputArray;
 }
 
+$( window ).resize(function() {
+  //redraw game
+  if(window.innerHeight < 770 || window.innerWidth < 770){
+  	if(window.innerHeight > 200 && window.innerWidth > 200){
+  		gameDraw(null);
+  		$("#colorText").width(window.innerWidth);
+  		$("#turnText").css("font-size", "15px");
+  	}
+  }else{
+  	if(canvas.width != 720){
+  		gameDraw("standard");
+  		$("#turnText").css("font-size", "25px");
+  	}
+  }
+});
+
 //create a 2d array to store all the places on the board
 var board = new Array(8);
 for(var k = 0; k<board.length; k++){
@@ -241,7 +258,7 @@ for(var i=0; i<8; i++){
 				board[i][j] = "X";
 
 				var checker = new Checker(90*j+45, 90*i+45, "red");
-				checker.draw();
+				checker.draw(null);
 
 				var square = new PlayableSquare(90*j, 90*i,90,90,squareNumber);
 				checker.setCurrentSquare(squareNumber);
@@ -255,7 +272,7 @@ for(var i=0; i<8; i++){
 				//black checkers
 				board[i][j] = "O";
 				var checker = new Checker(90*j+45, 90*i+45,"black");
-				checker.draw();
+				checker.draw(null);
       			
       			var square = new PlayableSquare(90*j, 90*i,90,90,squareNumber);
       			checker.setCurrentSquare(squareNumber);
@@ -269,8 +286,7 @@ for(var i=0; i<8; i++){
 				//add the black square to the array squares that are playable
 				playableSquares.push(new PlayableSquare(90*j, 90*i,90,90,squareNumber));
 				squareNumber++;
-			}
-			
+			}	
 		}
 	}
 }
@@ -331,7 +347,7 @@ $("#myCanvas").click(function(event){
 					if(previousSquare != ""){
 						previousSquare.removeChecker();
 					}
-					checkerSelected.draw();
+					checkerSelected.draw(null);
 					gameSquare.placeChecker(checkerSelected);
 					previousSquare = "";
 
@@ -384,14 +400,62 @@ $("#myCanvas").click(function(event){
 });
 
 //redraw the game once opponent returns
+//treat this function as if it is overloaded and use it to draw the game on a resize as well
 function gameDraw(nextGameBoard){
-	nextGameBoard.getPlayableSquares().forEach(function(gameSquare){
-		gameSquare.draw();
-		if(!gameSquare.isEmpty()){
-			var checker = gameSquare.getChecker();
-			checker.draw();
+	ctx = canvas.getContext("2d");
+
+	//redraw standard canvas
+	if(nextGameBoard == "standard"){
+		canvas.width = 720;
+		canvas.height = 720;
+		//set the entire background red
+		ctx.fillStyle = 'red';
+		ctx.fillRect(0,0,720,720);
+		playableSquares.forEach(function(gameSquare){
+			gameSquare.draw(720);
+			if(!gameSquare.isEmpty()){
+				var checker = gameSquare.getChecker();
+				checker.draw((720));
+			}
+		});
+	}
+	//draw the game on an opponent move
+	else if(nextGameBoard != null && nextGameBoard.hasOwnProperty('points')){
+		nextGameBoard.getPlayableSquares().forEach(function(gameSquare){
+			gameSquare.draw(null);
+			if(!gameSquare.isEmpty()){
+				var checker = gameSquare.getChecker();
+				checker.draw(null);
+			}
+		});
+	}else{
+
+		//draw the game on a resize
+		var smallerSize = 0;
+		if(window.innerWidth != window.innerHeight){
+			if (window.innerWidth > window.innerHeight){
+				smallerSize = window.innerHeight;
+			}else{
+				smallerSize = window.innerWidth;
+			}
+		}else{
+			smallerSize = window.innerWidth;
 		}
-	});
+		canvas.width = smallerSize;
+		canvas.height = smallerSize;
+		//set the entire background red
+		ctx.fillStyle = 'red';
+		ctx.fillRect(0,0,smallerSize, smallerSize);
+
+		//draw the play squares and their checkers
+		playableSquares.forEach(function(gameSquare){
+			gameSquare.draw(smallerSize);
+			if(!gameSquare.isEmpty()){
+				var checker = gameSquare.getChecker();
+				checker.draw((smallerSize));
+			}
+		});
+	}
 }
 
 function onOpponentMove(nextGameBoard){
@@ -406,16 +470,19 @@ function onOpponentMove(nextGameBoard){
 function userMoveMade(){
 	checkGameStatus();
     //change whose turn it is
-    turnUser = false;
     
-    var nextGameBoard = {};    
-    //if the game is not being played against AI, package the game and send to other player
-    if(opponentAI == true){
-        nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers).getPlayableSquares();
-        onOpponentMove(nextGameBoard);
-    }else{
-		socket.emit("player move", JSON.stringify(playableSquares));
-    }
+    turnUser = true;
+
+    //turnUser = false;
+    
+    //var nextGameBoard = {};    
+    ////if the game is not being played against AI, package the game and send to other player
+    //if(opponentAI == true){
+    //    nextGameBoard = opponent.playGame(playableSquares, redCheckers, blackCheckers).getPlayableSquares();
+    //    onOpponentMove(nextGameBoard);
+    //}else{
+	//	socket.emit("player move", JSON.stringify(playableSquares));
+    //}
 }
 
 </script>

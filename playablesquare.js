@@ -49,9 +49,16 @@ function PlayableSquare(x,y,w,h, number){
 		return this.squareNumber;
 	}
 
-	this.draw = function(){
+	this.draw = function(size){
 		ctx.fillStyle = "black";
-		ctx.fillRect(this.x, this.y,90,90);
+		if(size != null && size != 720){
+
+			newX = this.x * (size/720);
+			newY = this.y * (size/720);
+			ctx.fillRect(newX, newY,(size/8),(size/8));
+		}else{ 
+			ctx.fillRect(this.x, this.y,90,90);
+		}
 	}
 
 	this.getChecker = function(){
