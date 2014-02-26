@@ -198,6 +198,21 @@ function handleScreenSize(mouseX, mouseY){
 	mouseX = mouseX - position.left;
 	mouseY = mouseY + scrollOffset - position.top;
 
+//	if(window.innerWidth < 720 || window.innerHeight < 720){
+//		var smallerSize = 0;
+//		if(window.innerWidth != window.innerHeight){
+//			if (window.innerWidth > window.innerHeight){
+//				smallerSize = window.innerHeight;
+//			}else{
+//				smallerSize = window.innerWidth;
+//			}
+//		}else{
+//			smallerSize = window.innerWidth;
+//		}
+//		mouseX = mouseX * (720/smallerSize);
+//		mouseY = mouseY * (720/smallerSize);
+//	}
+
 	outputArray[0] = mouseX;
 	outputArray[1] = mouseY;
 
@@ -432,9 +447,9 @@ function gameDraw(nextGameBoard){
 
 		//draw the game on a resize
 		var smallerSize = 0;
-		if(window.innerWidth != window.innerHeight){
-			if (window.innerWidth > window.innerHeight){
-				smallerSize = window.innerHeight;
+		if(window.innerWidth != window.innerHeight-45){
+			if (window.innerWidth > window.innerHeight-45){
+				smallerSize = window.innerHeight-45;
 			}else{
 				smallerSize = window.innerWidth;
 			}
@@ -485,6 +500,8 @@ function userMoveMade(){
     //}
 }
 
+//size window correctly for the small screen
+$( window ).resize();
 </script>
 
 
